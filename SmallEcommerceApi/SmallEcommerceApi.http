@@ -1,0 +1,6 @@
+@SmallEcommerceApi_HostAddress = http://localhost:5090
+
+GET {{SmallEcommerceApi_HostAddress}}/Scalar/
+Accept: application/json
+
+###

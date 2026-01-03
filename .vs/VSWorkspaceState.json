@@ -1,0 +1,15 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\SmallEcommerceApi",
+    "\\SmallEcommerceApi\\Controllers\\Products",
+    "\\SmallEcommerceApi\\DTOs",
+    "\\SmallEcommerceApi\\DTOs\\Products",
+    "\\SmallEcommerceApi\\Mapping",
+    "\\SmallEcommerceApi\\Models",
+    "\\SmallEcommerceApi\\Security",
+    "\\SmallEcommerceApi\\Services"
+  ],
+  "SelectedNode": "\\SmallEcommerceApi\\DTOs\\Products\\CreateProductWithVariantsDto.cs",
+  "PreviewInSolutionExplorer": false
+}
