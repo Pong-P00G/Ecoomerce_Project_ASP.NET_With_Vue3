@@ -114,58 +114,57 @@ const submitForm = async () => {
 </script>
 
 <template>
-    <div class="min-h-screen bg-linear-to-b from-gray-50 to-white">
+    <div class="min-h-screen bg-linear-to-br from-indigo-50 via-purple-50 to-pink-50">
 
         <!-- Hero Section -->
         <section
-            class="bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 text-white py-20 relative overflow-hidden">
-            <!-- Decorative Elements -->
-            <div class="absolute inset-0 opacity-10">
-                <div class="absolute top-0 right-1/4 w-96 h-96 bg-violet-600 rounded-full blur-3xl"></div>
-                <div class="absolute bottom-0 left-1/4 w-96 h-96 bg-purple-600 rounded-full blur-3xl"></div>
+            class="relative bg-linear-to-r from-indigo-600 via-purple-600 to-pink-600 text-white py-28 overflow-hidden">
+            <!-- Animated Background Shapes -->
+            <div class="absolute inset-0 overflow-hidden">
+                <div class="absolute -top-40 -right-40 w-80 h-80 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
+                <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-white/10 rounded-full blur-3xl animate-pulse" style="animation-delay: 1s;"></div>
+                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-white/5 rounded-full blur-2xl"></div>
             </div>
 
             <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center space-y-6 max-w-3xl mx-auto">
+                <div class="text-center space-y-8 max-w-4xl mx-auto">
                     <div
-                        class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md rounded-full text-white text-sm font-semibold mb-4">
-                        <Mail class="w-4 h-4" />
-                        Get In Touch
+                        class="inline-flex items-center gap-2 px-6 py-3 bg-white/20 backdrop-blur-xl rounded-full text-white text-sm font-bold shadow-lg border border-white/30 hover:bg-white/30 transition-all duration-300">
+                        <Mail class="w-5 h-5" />
+                        Let's Connect
                     </div>
 
-                    <h1 class="text-5xl md:text-6xl font-black leading-tight">
-                        We'd Love to
-                        <span
-                            class="block bg-linear-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">
-                            Hear From You
+                    <h1 class="text-6xl md:text-7xl font-extrabold leading-tight tracking-tight">
+                        Get in Touch
+                        <span class="block bg-linear-to-r from-yellow-300 via-pink-300 to-white bg-clip-text text-transparent mt-2">
+                            We're Here to Help
                         </span>
                     </h1>
 
-                    <p class="text-xl text-gray-300 leading-relaxed">
-                        Have a question or feedback? Our team is here to help you 24/7.
-                        Choose your preferred way to reach out.
+                    <p class="text-xl md:text-2xl text-indigo-100 leading-relaxed max-w-2xl mx-auto font-light">
+                        Have questions? Need support? We're available 24/7 to assist you with anything you need.
                     </p>
                 </div>
             </div>
         </section>
 
         <!-- Contact Information Cards -->
-        <section class="py-16 -mt-12 relative z-10">
+        <section class="py-16 -mt-16 relative z-10">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <div v-for="info in contactInfo" :key="info.title"
-                        class="bg-white p-6 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 group">
+                        class="bg-white/90 backdrop-blur-sm p-8 rounded-3xl shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 border-2 border-purple-100 group hover:border-purple-300">
                         <div
-                            :class="`inline-flex items-center justify-center w-14 h-14 bg-linear-to-br ${info.color} rounded-2xl shadow-lg group-hover:scale-110 transition-transform duration-300 mb-4`">
-                            <component :is="info.icon" class="w-7 h-7 text-white" />
+                            :class="`inline-flex items-center justify-center w-16 h-16 bg-linear-to-br ${info.color} rounded-2xl shadow-xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 mb-5`">
+                            <component :is="info.icon" class="w-8 h-8 text-white" />
                         </div>
-                        <h3 class="text-lg font-bold text-gray-900 mb-2">{{ info.title }}</h3>
+                        <h3 class="text-xl font-extrabold text-gray-900 mb-3">{{ info.title }}</h3>
                         <a v-if="info.link" :href="info.link"
-                            class="text-violet-600 font-semibold hover:text-violet-700 transition-colors block mb-1">
+                            class="text-purple-600 font-bold hover:text-purple-700 transition-colors block mb-2 text-lg">
                             {{ info.details }}
                         </a>
-                        <p v-else class="text-gray-900 font-semibold mb-1">{{ info.details }}</p>
-                        <p class="text-sm text-gray-600">{{ info.description }}</p>
+                        <p v-else class="text-gray-900 font-bold mb-2 text-lg">{{ info.details }}</p>
+                        <p class="text-sm text-gray-600 leading-relaxed">{{ info.description }}</p>
                     </div>
                 </div>
             </div>
@@ -178,22 +177,22 @@ const submitForm = async () => {
 
                     <!-- Contact Form -->
                     <div>
-                        <div class="mb-8">
-                            <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-3">
+                        <div class="mb-10">
+                            <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 leading-tight">
                                 Send Us a <span
-                                    class="bg-linear-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">Message</span>
+                                    class="bg-linear-to-r from-purple-600 via-pink-600 to-indigo-600 bg-clip-text text-transparent">Message</span>
                             </h2>
-                            <p class="text-gray-600 text-lg">
-                                Fill out the form below and we'll get back to you as soon as possible.
+                            <p class="text-gray-600 text-lg leading-relaxed">
+                                Fill out the form and our team will respond within 24 hours.
                             </p>
                         </div>
 
                         <!-- Success Message -->
                         <transition name="fade">
                             <div v-if="formSubmitted"
-                                class="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3">
-                                <CheckCircle class="w-5 h-5 text-green-600 flex-shrink-" />
-                                <p class="text-green-700 font-medium">Thank you! Your message has been sent
+                                class="mb-8 p-5 bg-linear-to-r from-green-50 to-emerald-50 border-2 border-green-300 rounded-2xl flex items-center gap-4 shadow-lg">
+                                <CheckCircle class="w-6 h-6 text-green-600 shrink-0" />
+                                <p class="text-green-800 font-semibold text-lg">Thank you! Your message has been sent
                                     successfully.</p>
                             </div>
                         </transition>

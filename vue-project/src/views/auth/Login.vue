@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import { authApi } from '../../api/authApi';
+import { authAPI } from '../../api/authApi';
 import { useRouter } from 'vue-router';
 import {
   Mail,
@@ -34,12 +34,12 @@ const handleLogin = async () => {
     loading.value = true;
     
     try {
-        const response = await authApi.login({
+        const response = await authAPI.login({
             emailOrUsername: emailOrUsername.value,
             password: password.value
         });
         
-        // Store token based on remember me preference
+        // Store token based on a remember me preference
         if (response.data.token) {
             if (rememberMe.value) {
                 localStorage.setItem('authToken', response.data.token);
@@ -60,7 +60,7 @@ const handleLogin = async () => {
         }
         // Success message
         alert('Login successful!');
-        // Redirect based on user role
+        // Redirect based on a user role
         const userRole = response.data.user?.role || response.data.role;
         
         if (userRole === 'admin') {

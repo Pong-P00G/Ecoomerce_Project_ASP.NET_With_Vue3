@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue';
-import { authApi } from '../../api/authApi';
+import { authAPI } from '../../api/authApi';
 import { useRouter } from 'vue-router';
 import { 
   User, 
@@ -71,7 +71,7 @@ const handleRegister = async () => {
     }
     loading.value = true;
     try {
-        const response = await authApi.register({
+        const response = await authAPI.register({
             username: formData.value.username,
             firstname: formData.value.firstname,
             lastname: formData.value.lastname,

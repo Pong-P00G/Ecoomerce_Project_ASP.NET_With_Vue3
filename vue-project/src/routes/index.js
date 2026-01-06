@@ -68,13 +68,13 @@ const routes = [
                 path: '/login',
                 name: 'Login',
                 component: () => import("../views/auth/Login.vue"),
-                meta: { guest: true } // Only accessible when not logged in
+                // meta: { guest: true } // Only accessible when not logged in
             },
             {
                 path: '/register',
                 name: 'Register',
                 component: () => import("../views/auth/Register.vue"),
-                meta: { guest: true }
+                // meta: { guest: true }
             },
             {
                 path: '/forgot-password',

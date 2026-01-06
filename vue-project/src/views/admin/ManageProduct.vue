@@ -253,233 +253,197 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-linear-to-br from-gray-50 to-gray-100">
+  <div class="min-h-screen bg-slate-50/50">
     <!-- Error Banner -->
     <Transition name="slide-down">
-      <div v-if="error" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-2xl px-4">
-        <div class="bg-red-50 border-2 border-red-200 rounded-2xl p-4 shadow-xl flex items-center gap-3">
-          <AlertCircle class="w-5 h-5 text-red-600 shrink-0" />
-          <div class="flex-1">
-            <p class="text-sm font-semibold text-red-900">Error</p>
-            <p class="text-xs text-red-700 mt-0.5">{{ error }}</p>
+      <div v-if="error" class="fixed top-8 left-1/2 -translate-x-1/2 z-[100] w-full max-w-2xl px-6">
+        <div class="bg-white border border-rose-100 rounded-[32px] p-6 shadow-2xl shadow-rose-200/50 flex items-center gap-6">
+          <div class="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center shrink-0">
+            <AlertCircle class="w-7 h-7 text-rose-500" />
           </div>
-          <button @click="error = null; fetchProducts()"
-            class="text-sm font-medium text-red-700 hover:text-red-900 underline">
-            Retry
-          </button>
-          <button @click="error = null" class="text-red-400 hover:text-red-600">
-            <X class="w-4 h-4" />
-          </button>
+          <div class="flex-1">
+            <p class="text-sm font-black text-slate-900 uppercase tracking-widest">System Error</p>
+            <p class="text-xs text-slate-500 mt-1 font-bold leading-relaxed">{{ error }}</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <button @click="error = null; fetchProducts()" class="p-3 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-all shadow-sm">
+              <RefreshCw class="w-5 h-5" />
+            </button>
+            <button @click="error = null" class="p-3 bg-slate-100 text-slate-400 rounded-xl hover:bg-slate-200 transition-all">
+              <X class="w-5 h-5" />
+            </button>
+          </div>
         </div>
       </div>
     </Transition>
 
     <!-- Success Message -->
     <Transition name="slide-down">
-      <div v-if="success" class="fixed top-4 right-4 z-50 max-w-md">
-        <div class="bg-emerald-50 border-2 border-emerald-200 text-emerald-800 px-6 py-4 rounded-2xl shadow-xl flex items-center gap-3">
-          <CheckCircle class="w-5 h-5 shrink-0" />
-          <span class="flex-1 font-medium">{{ success }}</span>
-          <button @click="success = null" class="text-emerald-600 hover:text-emerald-800 transition-colors">
-            <X class="w-4 h-4" />
+      <div v-if="success" class="fixed top-8 right-8 z-[100] max-w-md">
+        <div class="bg-slate-900 border border-slate-800 text-white px-8 py-5 rounded-[24px] shadow-2xl flex items-center gap-4">
+          <div class="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shrink-0">
+            <CheckCircle class="w-6 h-6 text-white" />
+          </div>
+          <span class="flex-1 font-bold text-sm tracking-tight">{{ success }}</span>
+          <button @click="success = null" class="text-slate-400 hover:text-white transition-colors p-1">
+            <X class="w-5 h-5" />
           </button>
         </div>
       </div>
     </Transition>
 
     <!-- Header -->
-    <header class="bg-white shadow-sm border-b border-gray-200">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-          <div>
-            <h1 class="text-3xl font-bold text-gray-900 flex items-center gap-3">
-              <div class="bg-blue-600 p-2 rounded-xl">
-                <Package class="w-6 h-6 text-white" />
-              </div>
-              Product Management
-            </h1>
-            <p class="text-sm text-gray-600 mt-2">Manage inventory, pricing, and stock levels</p>
+    <header class="bg-white border-b border-slate-100 sticky top-0 z-40">
+      <div class="max-w-[1600px] mx-auto px-6 sm:px-8 lg:px-12 py-8">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-8">
+          <div class="flex items-center gap-6">
+            <div class="w-16 h-16 bg-slate-900 rounded-[24px] flex items-center justify-center shadow-xl shadow-slate-200">
+              <Package class="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <h1 class="text-3xl font-black text-slate-900 tracking-tight">Products</h1>
+              <p class="text-sm text-slate-400 mt-1 font-bold uppercase tracking-widest">Inventory Control</p>
+            </div>
           </div>
-          <button @click="fetchProducts"
-            class="self-start sm:self-auto flex items-center gap-2 px-5 py-2.5 text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all hover:shadow-md"
-            :disabled="loading">
-            <RefreshCw :class="['w-4 h-4', loading && 'animate-spin']" />
-            <span>{{ loading ? 'Refreshing...' : 'Refresh' }}</span>
-          </button>
+          <div class="flex items-center gap-3">
+            <button @click="fetchProducts"
+              class="flex items-center gap-3 px-6 py-3.5 text-sm font-black text-slate-700 bg-white border-2 border-slate-100 rounded-2xl hover:bg-slate-50 transition-all active:scale-95 disabled:opacity-50"
+              :disabled="loading">
+              <RefreshCw :class="['w-5 h-5', loading && 'animate-spin']" />
+              <span>{{ loading ? 'Syncing...' : 'Refresh' }}</span>
+            </button>
+            <button @click="openAddModal"
+              class="flex items-center gap-3 px-8 py-4 bg-blue-600 text-white rounded-[20px] hover:bg-blue-700 transition-all shadow-xl shadow-blue-200 active:scale-95 font-black text-sm uppercase tracking-widest">
+              <Plus class="w-5 h-5" />
+              New Product
+            </button>
+          </div>
         </div>
       </div>
     </header>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <!-- Loading State -->
-      <div v-if="loading && products.length === 0" class="space-y-6">
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
-          <div v-for="i in 5" :key="i" class="bg-white p-6 rounded-2xl shadow-sm animate-pulse">
-            <div class="h-4 bg-gray-200 rounded w-24 mb-3"></div>
-            <div class="h-8 bg-gray-200 rounded w-16"></div>
-          </div>
-        </div>
-      </div>
-
+    <main class="max-w-[1600px] mx-auto px-6 sm:px-8 lg:px-12 py-12">
       <!-- Stats Cards -->
-      <div v-else class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
-        <div class="bg-white rounded-2xl shadow-sm p-6 hover:shadow-lg transition-all border-2 border-transparent hover:border-blue-100">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Products</p>
-              <p class="text-3xl font-bold text-gray-900 mt-2">{{ stats.total }}</p>
-            </div>
-            <div class="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center">
-              <Package class="w-7 h-7 text-blue-600" />
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white rounded-2xl shadow-sm p-6 hover:shadow-lg transition-all border-2 border-transparent hover:border-emerald-100">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">In Stock</p>
-              <p class="text-3xl font-bold text-emerald-600 mt-2">{{ stats.inStock }}</p>
-            </div>
-            <div class="w-14 h-14 bg-emerald-100 rounded-xl flex items-center justify-center">
-              <CheckCircle class="w-7 h-7 text-emerald-600" />
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
+        <div v-for="(stat, idx) in [
+          { label: 'Inventory', value: stats.total, icon: Package, color: 'blue', bg: 'bg-blue-50', text: 'text-blue-600' },
+          { label: 'Healthy', value: stats.inStock, icon: CheckCircle, color: 'emerald', bg: 'bg-emerald-50', text: 'text-emerald-600' },
+          { label: 'Low Stock', value: stats.lowStock, icon: AlertCircle, color: 'amber', bg: 'bg-amber-50', text: 'text-amber-600' },
+          { label: 'Critical', value: stats.outOfStock, icon: X, color: 'rose', bg: 'bg-rose-50', text: 'text-rose-600' },
+          { label: 'Asset Value', value: '$' + stats.totalValue.toLocaleString(), icon: DollarSign, color: 'slate', bg: 'bg-slate-900', text: 'text-white' }
+        ]" :key="idx" 
+          class="bg-white rounded-[32px] p-8 border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+          <div class="flex items-center justify-between mb-6">
+            <div :class="`w-14 h-14 ${stat.bg} rounded-2xl flex items-center justify-center transition-transform group-hover:rotate-12` ">
+              <component :is="stat.icon" :class="`w-7 h-7 ${stat.text}`" />
             </div>
           </div>
-        </div>
-
-        <div class="bg-white rounded-2xl shadow-sm p-6 hover:shadow-lg transition-all border-2 border-transparent hover:border-amber-100">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Low Stock</p>
-              <p class="text-3xl font-bold text-amber-600 mt-2">{{ stats.lowStock }}</p>
-            </div>
-            <div class="w-14 h-14 bg-amber-100 rounded-xl flex items-center justify-center">
-              <AlertCircle class="w-7 h-7 text-amber-600" />
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white rounded-2xl shadow-sm p-6 hover:shadow-lg transition-all border-2 border-transparent hover:border-rose-100">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Out of Stock</p>
-              <p class="text-3xl font-bold text-rose-600 mt-2">{{ stats.outOfStock }}</p>
-            </div>
-            <div class="w-14 h-14 bg-rose-100 rounded-xl flex items-center justify-center">
-              <X class="w-7 h-7 text-rose-600" />
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-linear-to-br from-blue-600 to-blue-700 rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-xs font-semibold text-blue-100 uppercase tracking-wider">Total Value</p>
-              <p class="text-2xl font-bold text-white mt-2">${{ stats.totalValue.toLocaleString() }}</p>
-            </div>
-            <div class="w-14 h-14 bg-white/20 rounded-xl flex items-center justify-center">
-              <DollarSign class="w-7 h-7 text-white" />
-            </div>
-          </div>
+          <p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{{ stat.label }}</p>
+          <p class="text-3xl font-black text-slate-900 mt-2 tracking-tight">{{ stat.value }}</p>
         </div>
       </div>
 
       <!-- Actions Bar -->
-      <div class="bg-white rounded-2xl shadow-sm mb-8 p-6 border border-gray-200">
-        <div class="flex flex-col lg:flex-row gap-4">
+      <div class="bg-white rounded-[40px] shadow-sm mb-12 p-8 border border-slate-100">
+        <div class="flex flex-col lg:flex-row gap-6">
           <!-- Search -->
           <div class="flex-1">
-            <div class="relative">
-              <Search class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
+            <div class="relative group">
+              <Search class="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 w-6 h-6 group-focus-within:text-blue-600 transition-colors" />
               <input v-model="searchTerm" type="text"
-                placeholder="Search by name, category, or SKU..."
-                class="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" />
+                placeholder="Find product by name, category or SKU..."
+                class="w-full pl-16 pr-6 py-4.5 bg-slate-50 border-2 border-transparent rounded-[24px] focus:bg-white focus:border-blue-100 focus:ring-4 focus:ring-blue-50 transition-all font-bold text-slate-600" />
             </div>
           </div>
 
-          <!-- Filters & Actions -->
-          <div class="flex flex-wrap gap-3">
+          <!-- Filters -->
+          <div class="flex flex-wrap gap-4">
             <select v-model="selectedCategory"
-              class="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 text-sm font-medium">
-              <option value="all">All Categories</option>
+              class="px-8 py-4.5 bg-slate-50 border-2 border-transparent rounded-[24px] focus:bg-white focus:border-blue-100 transition-all font-black text-xs uppercase tracking-widest text-slate-700 outline-none cursor-pointer">
+              <option value="all">Categories</option>
               <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
             </select>
 
             <select v-model="selectedStock"
-              class="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 text-sm font-medium">
-              <option value="all">All Stock Levels</option>
+              class="px-8 py-4.5 bg-slate-50 border-2 border-transparent rounded-[24px] focus:bg-white focus:border-blue-100 transition-all font-black text-xs uppercase tracking-widest text-slate-700 outline-none cursor-pointer">
+              <option value="all">Stock Levels</option>
               <option value="in-stock">In Stock</option>
               <option value="low-stock">Low Stock</option>
-              <option value="out-of-stock">Out of Stock</option>
+              <option value="out-of-stock">Critical</option>
             </select>
 
             <button @click="exportToCSV"
-              class="flex items-center gap-2 px-5 py-3 bg-gray-50 text-gray-700 border border-gray-200 rounded-xl hover:bg-gray-100 transition-all font-semibold text-sm">
-              <Download class="w-4 h-4" />
+              class="flex items-center gap-3 px-8 py-4.5 bg-slate-50 text-slate-700 rounded-[24px] hover:bg-slate-100 transition-all font-black text-xs uppercase tracking-widest active:scale-95">
+              <Download class="w-5 h-5" />
               Export
-            </button>
-
-            <button @click="openAddModal"
-              class="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 font-semibold text-sm">
-              <Plus class="w-4 h-4" />
-              Add Product
             </button>
           </div>
         </div>
       </div>
 
       <!-- Products Table -->
-      <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-200">
-        <!-- Empty State -->
-        <div v-if="filteredProducts.length === 0 && !loading" class="text-center py-16">
-          <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Package class="w-10 h-10 text-gray-400" />
+      <div class="bg-white rounded-[48px] shadow-sm overflow-hidden border border-slate-100">
+        <div v-if="loading && products.length === 0" class="p-20 space-y-8">
+          <div v-for="i in 5" :key="i" class="flex items-center gap-8 animate-pulse">
+            <div class="w-20 h-20 bg-slate-100 rounded-3xl"></div>
+            <div class="flex-1 space-y-4">
+              <div class="h-6 bg-slate-100 rounded-lg w-1/3"></div>
+              <div class="h-4 bg-slate-100 rounded-lg w-1/4"></div>
+            </div>
           </div>
-          <p class="text-gray-600 font-semibold text-lg mb-2">No products found</p>
-          <p class="text-sm text-gray-500 mb-6">Try adjusting your filters or add a new product</p>
+        </div>
+
+        <div v-else-if="filteredProducts.length === 0" class="text-center py-32">
+          <div class="w-32 h-32 bg-slate-50 rounded-[40px] flex items-center justify-center mx-auto mb-8">
+            <Package class="w-16 h-16 text-slate-200" />
+          </div>
+          <h3 class="text-2xl font-black text-slate-900 tracking-tight">No results found</h3>
+          <p class="text-slate-400 mt-2 font-bold max-w-sm mx-auto">We couldn't find any products matching your current search or filter criteria.</p>
           <button @click="searchTerm = ''; selectedCategory = 'all'; selectedStock = 'all'"
-            class="px-6 py-2.5 text-sm font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors">
-            Clear Filters
+            class="mt-8 px-10 py-4 bg-slate-900 text-white rounded-[20px] font-black uppercase tracking-widest text-xs hover:bg-slate-800 transition-all active:scale-95">
+            Reset Filters
           </button>
         </div>
 
-        <!-- Table -->
-        <div v-else class="overflow-x-auto">
-          <table class="w-full">
+        <div v-else class="overflow-x-auto px-4">
+          <table class="w-full border-separate border-spacing-y-4">
             <thead>
-              <tr class="bg-gray-50 border-b border-gray-200">
-                <th class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Product</th>
-                <th class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">SKU</th>
-                <th class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Category</th>
-                <th class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Stock</th>
-                <th class="px-6 py-4 text-left text-xs font-bold text-gray-600 uppercase tracking-wider">Price</th>
-                <th class="px-6 py-4 text-right text-xs font-bold text-gray-600 uppercase tracking-wider">Actions</th>
+              <tr>
+                <th class="px-8 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Product Info</th>
+                <th class="px-8 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">SKU</th>
+                <th class="px-8 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Category</th>
+                <th class="px-8 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Inventory</th>
+                <th class="px-8 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Price</th>
+                <th class="px-8 py-6 text-right text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Actions</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
+            <tbody>
               <tr v-for="product in filteredProducts" :key="product.id"
-                class="hover:bg-gray-50 transition-colors group">
-                <td class="px-6 py-4">
-                  <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-xl bg-linear-to-br from-blue-50 to-blue-100 flex items-center justify-center shrink-0">
-                      <Package class="w-6 h-6 text-blue-600" />
+                class="group hover:bg-slate-50 transition-all duration-300 rounded-[32px]">
+                <td class="px-8 py-6 first:rounded-l-[32px]">
+                  <div class="flex items-center gap-6">
+                    <div class="w-20 h-20 rounded-[28px] bg-white shadow-sm border border-slate-100 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-500 overflow-hidden">
+                      <img v-if="product.images" :src="product.images" class="w-full h-full object-cover" />
+                      <Package v-else class="w-8 h-8 text-slate-200" />
                     </div>
                     <div class="min-w-0">
-                      <p class="font-semibold text-gray-900 truncate">{{ product.name }}</p>
-                      <p class="text-xs text-gray-500 truncate">{{ product.description || 'No description' }}</p>
+                      <p class="text-lg font-black text-slate-900 truncate tracking-tight">{{ product.name }}</p>
+                      <p class="text-xs font-bold text-slate-400 truncate mt-1 leading-relaxed">{{ product.description || 'No description provided' }}</p>
                     </div>
                   </div>
                 </td>
-                <td class="px-6 py-4 text-sm text-gray-600 font-medium">{{ product.sku }}</td>
-                <td class="px-6 py-4">
-                  <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg text-xs font-semibold uppercase">
-                    {{ product.category }}
-                  </span>
+                <td class="px-8 py-6">
+                  <span class="font-mono text-sm font-black text-slate-500 tracking-wider bg-slate-100 px-3 py-1.5 rounded-xl uppercase">{{ product.sku }}</span>
                 </td>
-                <td class="px-6 py-4">
-                  <div class="flex items-center gap-2">
-                    <div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden max-w-80px">
-                      <div class="h-full transition-all"
+                <td class="px-8 py-6">
+                  <div class="inline-flex items-center gap-2 px-4 py-2 bg-slate-50 text-slate-700 rounded-2xl text-[10px] font-black uppercase tracking-widest border border-slate-100/50">
+                    {{ product.category }}
+                  </div>
+                </td>
+                <td class="px-8 py-6">
+                  <div class="flex items-center gap-4">
+                    <div class="w-24 h-2.5 bg-slate-100 rounded-full overflow-hidden shrink-0">
+                      <div class="h-full transition-all duration-1000"
                         :class="{
                           'bg-rose-500': getStockStatus(product).color === 'red',
                           'bg-amber-500': getStockStatus(product).color === 'orange',
@@ -488,30 +452,30 @@ onMounted(() => {
                         :style="{ width: Math.min((product.stock / 100) * 100, 100) + '%' }">
                       </div>
                     </div>
-                    <span class="text-xs font-bold"
+                    <span class="text-xs font-black uppercase tracking-tighter"
                       :class="{
                         'text-rose-600': getStockStatus(product).color === 'red',
                         'text-amber-600': getStockStatus(product).color === 'orange',
                         'text-emerald-600': getStockStatus(product).color === 'green'
                       }">
-                      {{ product.stock }}
+                      {{ product.stock }} Qty
                     </span>
                   </div>
                 </td>
-                <td class="px-6 py-4 text-sm font-bold text-gray-900">${{ product.price.toFixed(2) }}</td>
-                <td class="px-6 py-4">
-                  <div class="flex justify-end gap-2">
+                <td class="px-8 py-6 text-lg font-black text-slate-900 tracking-tight">${{ product.price.toFixed(2) }}</td>
+                <td class="px-8 py-6 last:rounded-r-[32px]">
+                  <div class="flex justify-end gap-3">
                     <button @click="openViewModal(product)"
-                      class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all">
-                      <Eye class="w-4 h-4" />
+                      class="p-3.5 text-slate-400 hover:text-slate-900 hover:bg-white hover:shadow-lg rounded-2xl transition-all active:scale-90 border border-transparent hover:border-slate-100">
+                      <Eye class="w-5 h-5" />
                     </button>
                     <button @click="openEditModal(product)"
-                      class="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all">
-                      <Edit2 class="w-4 h-4" />
+                      class="p-3.5 text-slate-400 hover:text-blue-600 hover:bg-white hover:shadow-lg rounded-2xl transition-all active:scale-90 border border-transparent hover:border-slate-100">
+                      <Edit2 class="w-5 h-5" />
                     </button>
                     <button @click="handleDeleteProduct(product.id)"
-                      class="p-2 text-gray-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all">
-                      <Trash2 class="w-4 h-4" />
+                      class="p-3.5 text-slate-400 hover:text-rose-600 hover:bg-white hover:shadow-lg rounded-2xl transition-all active:scale-90 border border-transparent hover:border-slate-100">
+                      <Trash2 class="w-5 h-5" />
                     </button>
                   </div>
                 </td>
@@ -520,96 +484,109 @@ onMounted(() => {
           </table>
         </div>
       </div>
-    </div>
+    </main>
 
-    <!-- Add/Edit Product Modal -->
+    <!-- Form Modal -->
     <Teleport to="body">
       <Transition name="modal">
         <div v-if="showAddModal || showEditModal"
-          class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          class="fixed inset-0 bg-slate-900/60 backdrop-blur-xl flex items-center justify-center z-[100] p-6"
           @click.self="closeModals">
-          <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-hidden">
-            <div class="p-6 border-b border-gray-200 bg-linear-to-r from-blue-600 to-blue-700">
-              <div class="flex justify-between items-center">
-                <h3 class="text-2xl font-bold text-white">
-                  {{ showAddModal ? 'Add New Product' : 'Edit Product' }}
-                </h3>
-                <button @click="closeModals" class="p-2 hover:bg-white/10 rounded-lg transition-colors">
-                  <X class="w-5 h-5 text-white" />
-                </button>
+          <div class="bg-white rounded-[48px] shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col scale-100 transition-transform">
+            <div class="p-10 border-b border-slate-50 flex justify-between items-center shrink-0">
+              <div class="flex items-center gap-6">
+                <div class="w-14 h-14 bg-slate-900 rounded-2xl flex items-center justify-center">
+                  <Package class="w-7 h-7 text-white" />
+                </div>
+                <div>
+                  <h3 class="text-3xl font-black text-slate-900 tracking-tight">
+                    {{ showAddModal ? 'Create Product' : 'Edit Product' }}
+                  </h3>
+                  <p class="text-xs font-bold text-slate-400 uppercase tracking-[0.2em] mt-1">Configure your product data</p>
+                </div>
+              </div>
+              <button @click="closeModals" class="p-4 hover:bg-slate-50 rounded-2xl transition-all active:rotate-90 duration-300">
+                <X class="w-7 h-7 text-slate-400" />
+              </button>
+            </div>
+
+            <div class="p-10 overflow-y-auto grow custom-scrollbar">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <div class="space-y-8">
+                  <div class="group">
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1 group-focus-within:text-blue-600 transition-colors">Identification</label>
+                    <div class="space-y-4">
+                      <input v-model="formData.name" type="text" required
+                        class="w-full px-6 py-4.5 bg-slate-50 border-2 border-transparent rounded-[20px] focus:bg-white focus:border-blue-100 transition-all font-bold text-slate-700 outline-none"
+                        placeholder="Product Name" />
+                      <input v-model="formData.sku" type="text" required
+                        class="w-full px-6 py-4.5 bg-slate-50 border-2 border-transparent rounded-[20px] focus:bg-white focus:border-blue-100 transition-all font-mono font-bold text-slate-700 outline-none uppercase tracking-wider"
+                        placeholder="SKU Code" />
+                    </div>
+                  </div>
+
+                  <div class="group">
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">Classification</label>
+                    <div class="space-y-4">
+                      <input v-model="formData.category" type="text" required
+                        class="w-full px-6 py-4.5 bg-slate-50 border-2 border-transparent rounded-[20px] focus:bg-white focus:border-blue-100 transition-all font-bold text-slate-700 outline-none"
+                        placeholder="Category" />
+                      <input v-model="formData.supplier" type="text"
+                        class="w-full px-6 py-4.5 bg-slate-50 border-2 border-transparent rounded-[20px] focus:bg-white focus:border-blue-100 transition-all font-bold text-slate-700 outline-none"
+                        placeholder="Supplier Name" />
+                    </div>
+                  </div>
+
+                  <div class="group">
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">Images</label>
+                    <input v-model="formData.Images" type="text"
+                      class="w-full px-6 py-4.5 bg-slate-50 border-2 border-transparent rounded-[20px] focus:bg-white focus:border-blue-100 transition-all font-bold text-slate-700 outline-none"
+                      placeholder="Image URL" />
+                  </div>
+                </div>
+
+                <div class="space-y-8">
+                  <div class="group">
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">Inventory & Value</label>
+                    <div class="grid grid-cols-2 gap-4">
+                      <div class="space-y-2">
+                        <p class="text-[9px] font-bold text-slate-400 ml-1">PRICE ($)</p>
+                        <input v-model.number="formData.price" type="number" step="0.01" min="0" required
+                          class="w-full px-6 py-4.5 bg-slate-50 border-2 border-transparent rounded-[20px] focus:bg-white focus:border-blue-100 transition-all font-black text-slate-900 outline-none" />
+                      </div>
+                      <div class="space-y-2">
+                        <p class="text-[9px] font-bold text-slate-400 ml-1">TOTAL STOCK</p>
+                        <input v-model.number="formData.stock" type="number" min="0" required
+                          class="w-full px-6 py-4.5 bg-slate-50 border-2 border-transparent rounded-[20px] focus:bg-white focus:border-blue-100 transition-all font-black text-slate-900 outline-none" />
+                      </div>
+                    </div>
+                    <div class="mt-4">
+                      <p class="text-[9px] font-bold text-slate-400 ml-1 mb-2">MINIMUM ALERT LEVEL</p>
+                      <input v-model.number="formData.minStock" type="number" min="0"
+                        class="w-full px-6 py-4.5 bg-slate-50 border-2 border-transparent rounded-[20px] focus:bg-white focus:border-blue-100 transition-all font-black text-slate-900 outline-none" />
+                    </div>
+                  </div>
+
+                  <div class="group">
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 ml-1">Description</label>
+                    <textarea v-model="formData.description" rows="6"
+                      class="w-full px-6 py-5 bg-slate-50 border-2 border-transparent rounded-[24px] focus:bg-white focus:border-blue-100 transition-all font-bold text-slate-700 outline-none resize-none"
+                      placeholder="Provide detailed information about this product..."></textarea>
+                  </div>
+                </div>
               </div>
             </div>
 
-            <div class="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">Product Name *</label>
-                  <input v-model="formData.name" type="text" required
-                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    placeholder="e.g., Premium Widget" />
-                </div>
-
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">SKU *</label>
-                  <input v-model="formData.sku" type="text" required
-                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    placeholder="e.g., WDG-001" />
-                </div>
-
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">Category *</label>
-                  <input v-model="formData.category" type="text" required
-                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    placeholder="e.g., Electronics" />
-                </div>
-
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">Supplier</label>
-                  <input v-model="formData.supplier" type="text"
-                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    placeholder="e.g., ABC Corp" />
-                </div>
-
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">Stock Quantity *</label>
-                  <input v-model.number="formData.stock" type="number" min="0" required
-                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    placeholder="0" />
-                </div>
-
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">Minimum Stock</label>
-                  <input v-model.number="formData.minStock" type="number" min="0"
-                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    placeholder="10" />
-                </div>
-
-                <div>
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">Price *</label>
-                  <input v-model.number="formData.price" type="number" step="0.01" min="0" required
-                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    placeholder="0.00" />
-                </div>
-
-                <div class="md:col-span-2">
-                  <label class="block text-sm font-semibold text-gray-700 mb-2">Description</label>
-                  <textarea v-model="formData.description" rows="4"
-                    class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
-                    placeholder="Enter product description..."></textarea>
-                </div>
-              </div>
-            </div>
-
-            <div class="p-6 border-t border-gray-200 bg-gray-50 flex gap-3">
+            <div class="p-10 border-t border-slate-50 bg-slate-50/50 flex gap-4 shrink-0">
               <button @click="closeModals"
-                class="px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-all font-semibold">
-                Cancel
+                class="px-10 py-5 bg-white border-2 border-slate-200 text-slate-700 rounded-[20px] hover:bg-slate-50 transition-all font-black text-xs uppercase tracking-widest">
+                Discard Changes
               </button>
               <button @click="showAddModal ? handleAddProduct() : handleUpdateProduct()"
                 :disabled="loading || !formData.name || !formData.sku || !formData.category"
-                class="flex-1 bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-semibold flex items-center justify-center gap-2 shadow-lg shadow-blue-200">
+                class="flex-1 bg-slate-900 text-white py-5 rounded-[20px] hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3 shadow-xl shadow-slate-200">
                 <Loader2 v-if="loading" class="w-5 h-5 animate-spin" />
-                <span>{{ loading ? 'Saving...' : (showAddModal ? 'Add Product' : 'Update Product') }}</span>
+                <span>{{ loading ? 'Processing...' : (showAddModal ? 'Confirm Creation' : 'Update Record') }}</span>
               </button>
             </div>
           </div>
@@ -617,85 +594,73 @@ onMounted(() => {
       </Transition>
     </Teleport>
 
-    <!-- View Product Modal -->
+    <!-- View Modal -->
     <Teleport to="body">
       <Transition name="modal">
         <div v-if="showViewModal && currentProduct"
-          class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+          class="fixed inset-0 bg-slate-900/60 backdrop-blur-xl flex items-center justify-center z-[100] p-6"
           @click.self="closeModals">
-          <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden">
-            <div class="p-6 border-b border-gray-200 bg-linear-to-r from-gray-800 to-gray-900">
-              <div class="flex justify-between items-center">
-                <h3 class="text-2xl font-bold text-white">Product Details</h3>
-                <button @click="closeModals" class="p-2 hover:bg-white/10 rounded-lg transition-colors">
-                  <X class="w-5 h-5 text-white" />
-                </button>
+          <div class="bg-white rounded-[48px] shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col scale-100 transition-transform">
+            <div class="relative h-64 bg-slate-900 shrink-0">
+              <div v-if="currentProduct.images" class="absolute inset-0">
+                <img :src="currentProduct.images" class="w-full h-full object-cover opacity-60" />
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent"></div>
               </div>
+              <div class="absolute bottom-8 left-10 right-10 flex justify-between items-end">
+                <div>
+                  <span class="px-3 py-1 bg-blue-600 text-white rounded-lg text-[9px] font-black uppercase tracking-widest mb-3 inline-block">
+                    {{ currentProduct.category }}
+                  </span>
+                  <h3 class="text-4xl font-black text-white tracking-tight leading-none">{{ currentProduct.name }}</h3>
+                </div>
+                <div class="text-right">
+                  <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">Pricing</p>
+                  <p class="text-3xl font-black text-white mt-1 tracking-tight">${{ currentProduct.price.toFixed(2) }}</p>
+                </div>
+              </div>
+              <button @click="closeModals" class="absolute top-8 right-8 p-3 bg-white/10 hover:bg-white/20 text-white rounded-2xl backdrop-blur-md transition-all">
+                <X class="w-6 h-6" />
+              </button>
             </div>
 
-            <div class="p-6">
-              <div class="grid grid-cols-2 gap-6">
-                <div>
-                  <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Product Name</p>
-                  <p class="text-lg font-semibold text-gray-900 mt-1">{{ currentProduct.name }}</p>
+            <div class="p-10">
+              <div class="grid grid-cols-3 gap-8 mb-10">
+                <div class="bg-slate-50 p-6 rounded-3xl border border-slate-100/50">
+                  <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Inventory Status</p>
+                  <div class="flex items-center gap-3 mt-2">
+                    <div :class="`w-3 h-3 rounded-full ${getStockStatus(currentProduct).color === 'green' ? 'bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.5)]' : getStockStatus(currentProduct).color === 'orange' ? 'bg-amber-500 shadow-[0_0_12px_rgba(245,158,11,0.5)]' : 'bg-rose-500 shadow-[0_0_12px_rgba(244,63,94,0.5)]'}`"></div>
+                    <p class="text-lg font-black text-slate-900 tracking-tight">{{ currentProduct.stock }} <span class="text-xs font-bold text-slate-500">Units</span></p>
+                  </div>
                 </div>
-                <div>
-                  <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide">SKU</p>
-                  <p class="text-lg font-semibold text-gray-900 mt-1">{{ currentProduct.sku }}</p>
+                <div class="bg-slate-50 p-6 rounded-3xl border border-slate-100/50">
+                  <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Identification</p>
+                  <p class="text-lg font-black text-slate-900 mt-2 tracking-widest font-mono">{{ currentProduct.sku }}</p>
                 </div>
-                <div>
-                  <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Category</p>
-                  <p class="text-lg font-semibold text-gray-900 mt-1">{{ currentProduct.category }}</p>
+                <div class="bg-slate-50 p-6 rounded-3xl border border-slate-100/50">
+                  <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Total Asset Value</p>
+                  <p class="text-lg font-black text-blue-600 mt-2 tracking-tight">${{ (currentProduct.stock * currentProduct.price).toFixed(2) }}</p>
                 </div>
-                <div>
-                  <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Supplier</p>
-                  <p class="text-lg font-semibold text-gray-900 mt-1">{{ currentProduct.supplier || 'N/A' }}</p>
-                </div>
-                <div>
-                  <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Stock Quantity</p>
-                  <p class="text-lg font-semibold text-gray-900 mt-1">{{ currentProduct.stock }} units</p>
-                </div>
-                <div>
-                  <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Minimum Stock</p>
-                  <p class="text-lg font-semibold text-gray-900 mt-1">{{ currentProduct.minStock || 0 }} units</p>
-                </div>
-                <div>
-                  <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Price</p>
-                  <p class="text-lg font-semibold text-gray-900 mt-1">${{ currentProduct.price.toFixed(2) }}</p>
-                </div>
-                <div>
-                  <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Status</p>
-                  <span :class="[
-                    'inline-block px-3 py-1 text-sm font-bold rounded-full mt-1',
-                    getStockStatus(currentProduct).color === 'green' ? 'bg-emerald-100 text-emerald-700' :
-                    getStockStatus(currentProduct).color === 'orange' ? 'bg-amber-100 text-amber-700' :
-                    'bg-rose-100 text-rose-700'
-                  ]">
-                    {{ getStockStatus(currentProduct).text }}
-                  </span>
-                </div>
-                <div class="col-span-2">
-                  <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Description</p>
-                  <p class="text-base text-gray-900 mt-2">{{ currentProduct.description || 'No description available' }}</p>
-                </div>
-                <div class="col-span-2 pt-4 border-t border-gray-200">
-                  <p class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Total Value</p>
-                  <p class="text-2xl font-bold text-blue-600 mt-1">
-                    ${{ (currentProduct.stock * currentProduct.price).toFixed(2) }}
+              </div>
+
+              <div class="space-y-4">
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Product Description</p>
+                <div class="bg-slate-50/50 p-8 rounded-[32px] border border-slate-100/50 min-h-[120px]">
+                  <p class="text-slate-600 font-bold leading-relaxed italic">
+                    "{{ currentProduct.description || 'This product does not have a detailed description yet.' }}"
                   </p>
                 </div>
               </div>
-            </div>
 
-            <div class="p-6 border-t border-gray-200 bg-gray-50 flex gap-3">
-              <button @click="closeModals"
-                class="px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-all font-semibold">
-                Close
-              </button>
-              <button @click="openEditModal(currentProduct); showViewModal = false"
-                class="flex-1 bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 transition-all font-semibold shadow-lg shadow-blue-200">
-                Edit Product
-              </button>
+              <div class="flex gap-4 mt-12">
+                <button @click="closeModals"
+                  class="px-10 py-5 bg-white border-2 border-slate-100 text-slate-700 rounded-[20px] hover:bg-slate-50 transition-all font-black text-xs uppercase tracking-widest">
+                  Back to List
+                </button>
+                <button @click="openEditModal(currentProduct); showViewModal = false"
+                  class="flex-1 bg-slate-900 text-white py-5 rounded-[20px] hover:bg-slate-800 transition-all font-black text-xs uppercase tracking-widest shadow-xl shadow-slate-200">
+                  Modify Product Data
+                </button>
+              </div>
             </div>
           </div>
         </div>

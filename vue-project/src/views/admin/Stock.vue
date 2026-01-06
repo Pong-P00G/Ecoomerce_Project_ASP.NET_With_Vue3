@@ -15,8 +15,7 @@ import {
     X,
     Database
 } from 'lucide-vue-next'
-import productApi from '../../api/productsApi'
-import api from '../../api/api'
+import { productAPI } from '../../api/productsApi'
 
 // State
 const products = ref([])
@@ -91,7 +90,7 @@ const fetchProducts = async () => {
     try {
         loading.value = true
         error.value = null
-        const response = await productApi.getProducts()
+        const response = await productAPI.getProducts()
         products.value = response.data || []
     } catch (err) {
         error.value = err.response?.data?.message || 'Failed to fetch products'
@@ -114,7 +113,7 @@ const handleUpdateStock = async () => {
         updating.value = true
         error.value = null
 
-        await productApi.updateStock(currentProduct.value.id, newStockValue.value)
+        await productAPI.updateStock(currentProduct.value.id, newStockValue.value)
 
         // Update local state
         const index = products.value.findIndex(p => p.id === currentProduct.value.id)
@@ -154,318 +153,227 @@ onMounted(fetchProducts)
 </script>
 
 <template>
-    <div class="p-4 sm:p-6 lg:p-8 max-w-[1600px] mx-auto">
-       <!-- Error Banner -->
-       <div v-if="error" class="mb-6 bg-red-50 border border-red-200 rounded-2xl p-4 flex items-center gap-3">
-            <AlertCircle class="w-5 h-5 text-red-600 shrink-0" />
-            <div class="flex-1">
-                <p class="text-sm font-semibold text-red-900">Error loading inventory</p>
-                <p class="text-xs text-red-700 mt-0.5">{{ error }}</p>
-            </div>
-            <button @click="fetchProducts()" class="text-sm font-medium text-red-700 hover:text-red-900 underline">
-                Retry
-            </button>
+    <div class="min-h-screen bg-slate-50/50 p-6 sm:p-8 lg:p-12">
+    <div class="max-w-[1600px] mx-auto">
+      <!-- Header Section -->
+      <header class="mb-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+        <div class="flex items-center gap-5">
+          <div class="w-14 h-14 bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl flex items-center justify-center shadow-lg shadow-slate-200 rotate-3">
+            <Database class="w-7 h-7 text-white" />
+          </div>
+          <div>
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight">Stock Inventory</h1>
+            <p class="text-[10px] text-slate-400 mt-1 font-black uppercase tracking-[0.2em]">Real-time Warehouse Monitoring</p>
+          </div>
         </div>
-        <!-- Header Section -->
-        <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <button @click="fetchProducts"
+          class="flex items-center gap-2.5 px-6 py-3 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50 transition-all font-black text-xs uppercase tracking-widest shadow-sm active:scale-95 disabled:opacity-50"
+          :disabled="loading">
+          <RefreshCw class="w-4 h-4" :class="{ 'animate-spin': loading }" />
+          Synchronize
+        </button>
+      </header>
+
+      <div v-if="loading && products.length === 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        <div v-for="i in 4" :key="i" class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm animate-pulse">
+          <div class="w-10 h-10 bg-slate-50 rounded-xl mb-4"></div>
+          <div class="h-6 bg-slate-50 rounded-lg w-16 mb-2"></div>
+          <div class="h-3 bg-slate-50 rounded-lg w-24"></div>
+        </div>
+      </div>
+      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        <div v-for="(stat, idx) in [
+          { label: 'Unique SKUs', value: stats.totalItems, icon: Package, color: 'blue' },
+          { label: 'Low Levels', value: stats.lowStock, icon: AlertCircle, color: 'amber' },
+          { label: 'Out of Stock', value: stats.outOfStock, icon: TrendingDown, color: 'rose' },
+          { label: 'Inventory Value', value: '$' + stats.totalValue.toLocaleString(), icon: Database, color: 'emerald' }
+        ]" :key="idx" 
+          class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 group">
+          <div class="flex items-center gap-4">
+            <div :class="`w-12 h-12 rounded-2xl flex items-center justify-center bg-${stat.color}-50 text-${stat.color}-600 group-hover:scale-110 transition-transform duration-300` ">
+              <component :is="stat.icon" class="w-6 h-6" />
+            </div>
             <div>
-                <h1 class="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                    <Database class="w-8 h-8 text-blue-600" />
-                    Inventory & Stock
-                </h1>
-                <p class="text-gray-500 mt-1">Real-time monitoring and management of your product stock levels.</p>
+              <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ stat.label }}</p>
+              <p class="text-2xl font-black text-slate-900 tracking-tight">{{ stat.value }}</p>
             </div>
-            <button @click="fetchProducts"
-                class="flex items-center gap-2 px-6 py-3 bg-white border border-gray-100 rounded-2xl text-gray-700 hover:bg-gray-50 transition-all font-bold text-sm shadow-sm"
-                :disabled="loading">
-                <RefreshCw class="w-4 h-4" :class="{ 'animate-spin': loading }" />
-                Refresh Data
-            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm mb-10 flex flex-col md:flex-row gap-4 items-center">
+        <div class="flex-1 w-full relative group">
+          <Search class="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
+          <input v-model="searchTerm" type="text" placeholder="Find by product name or SKU code..."
+            class="w-full pl-12 pr-5 py-3.5 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:border-blue-200 focus:ring-4 focus:ring-blue-50/50 transition-all font-medium text-slate-600 text-sm outline-none" />
+        </div>
+        <div class="flex gap-3 w-full md:w-auto">
+          <div class="relative flex-1 md:flex-none">
+            <select v-model="selectedStockStatus"
+              class="appearance-none pl-10 pr-10 py-3.5 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:border-blue-200 transition-all text-[11px] font-black uppercase tracking-widest text-slate-700 outline-none cursor-pointer w-full">
+              <option value="all">Full Catalog</option>
+              <option value="healthy">Healthy Stock</option>
+              <option value="low">Low Inventory</option>
+              <option value="out">Critical (0)</option>
+            </select>
+            <Filter class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Inventory Table -->
+      <div class="bg-white rounded-[48px] border border-slate-100 shadow-sm overflow-hidden">
+        <div v-if="loading && products.length > 0" class="p-8 text-center bg-slate-50/50">
+          <div class="flex items-center justify-center gap-3">
+            <Loader2 class="w-5 h-5 animate-spin text-blue-600" />
+            <span class="text-xs font-black text-slate-400 uppercase tracking-widest">Refreshing Records...</span>
+          </div>
+        </div>
+        <div class="overflow-x-auto px-4">
+          <table class="w-full border-separate border-spacing-y-4">
+            <thead>
+              <tr>
+                <th class="px-8 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                  <button @click="toggleSort('name')" class="flex items-center gap-2 hover:text-slate-900 transition-colors">
+                    Product Info
+                    <ArrowUpDown class="w-3 h-3" />
+                  </button>
+                </th>
+                <th class="px-8 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">SKU</th>
+                <th class="px-8 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                  <button @click="toggleSort('price')" class="flex items-center gap-2 hover:text-slate-900 transition-colors">
+                    Unit Price
+                    <ArrowUpDown class="w-3 h-3" />
+                  </button>
+                </th>
+                <th class="px-8 py-6 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                  <button @click="toggleSort('stock')" class="flex items-center gap-2 hover:text-slate-900 transition-colors">
+                    Availability
+                    <ArrowUpDown class="w-3 h-3" />
+                  </button>
+                </th>
+                <th class="px-8 py-6 text-right text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Management</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="product in filteredProducts" :key="product.id"
+                class="group hover:bg-slate-50 transition-all duration-300 rounded-[32px]">
+                <td class="px-8 py-6 first:rounded-l-[32px]">
+                  <div class="flex items-center gap-6">
+                    <div class="w-16 h-16 rounded-[24px] bg-white shadow-sm border border-slate-100 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform duration-500">
+                      <Package class="w-7 h-7 text-slate-200" />
+                    </div>
+                    <div class="min-w-0">
+                      <p class="text-lg font-black text-slate-900 truncate tracking-tight">{{ product.name }}</p>
+                      <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">{{ product.category }}</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-8 py-6">
+                  <span class="font-mono text-xs font-black text-slate-500 tracking-wider bg-slate-100 px-3 py-1.5 rounded-xl uppercase">{{ product.sku || 'N/A' }}</span>
+                </td>
+                <td class="px-8 py-6 text-lg font-black text-slate-900 tracking-tight">${{ product.price.toLocaleString() }}</td>
+                <td class="px-8 py-6">
+                  <div class="flex items-center gap-5">
+                    <div class="w-32 h-2.5 bg-slate-100 rounded-full overflow-hidden shrink-0">
+                      <div class="h-full transition-all duration-1000"
+                        :class="product.stock === 0 ? 'bg-rose-500' : product.stock <= 10 ? 'bg-amber-500' : 'bg-emerald-500'"
+                        :style="{ width: Math.min((product.stock / 100) * 100, 100) + '%' }"></div>
+                    </div>
+                    <span :class="`text-xs font-black uppercase tracking-tighter ${product.stock === 0 ? 'text-rose-600' : product.stock <= 10 ? 'text-amber-600' : 'text-emerald-600'}`">
+                      {{ product.stock }} Units
+                    </span>
+                  </div>
+                </td>
+                <td class="px-8 py-6 last:rounded-r-[32px] text-right">
+                  <button @click="openUpdateModal(product)"
+                    class="p-3.5 text-slate-400 hover:text-blue-600 hover:bg-white hover:shadow-lg rounded-2xl transition-all active:scale-90 border border-transparent hover:border-slate-100"
+                    title="Update Stock Count">
+                    <Edit2 class="w-5 h-5" />
+                  </button>
+                </td>
+              </tr>
+              <tr v-if="filteredProducts.length === 0 && !loading">
+                <td colspan="5" class="px-8 py-32 text-center">
+                  <div class="w-32 h-32 bg-slate-50 rounded-[40px] flex items-center justify-center mx-auto mb-8 text-slate-100">
+                    <Database class="w-16 h-16" />
+                  </div>
+                  <h3 class="text-2xl font-black text-slate-900 tracking-tight">Empty Inventory</h3>
+                  <p class="text-slate-400 mt-2 font-bold max-w-sm mx-auto">No products were found matching your current filter parameters.</p>
+                  <button @click="searchTerm = ''; selectedStockStatus = 'all'"
+                    class="mt-8 px-10 py-4 bg-slate-900 text-white rounded-[20px] font-black uppercase tracking-widest text-xs hover:bg-slate-800 transition-all active:scale-95">
+                    Clear Search Filters
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
-        <!-- Loading Skeleton -->
-        <div v-if="loading && products.length === 0">
-            <!-- Stats Overview Skeleton -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <div v-for="i in 4" :key="i" class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm animate-pulse">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="p-3 bg-gray-200 rounded-2xl w-12 h-12"></div>
-                    </div>
-                    <div class="h-8 bg-gray-200 rounded w-20 mb-2"></div>
-                    <div class="h-3 bg-gray-200 rounded w-32"></div>
-                </div>
-            </div>
-            <!-- Filters Skeleton -->
-            <div class="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm mb-8 animate-pulse">
-                <div class="flex flex-col md:flex-row gap-4">
-                    <div class="flex-1 h-12 bg-gray-200 rounded-2xl"></div>
-                    <div class="h-12 bg-gray-200 rounded-2xl w-48"></div>
-                </div>
-            </div>
-            <!-- Table Skeleton -->
-            <div class="bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-hidden animate-pulse">
-                <div class="p-8 space-y-4">
-                    <div v-for="i in 5" :key="i" class="flex items-center gap-4 py-4 border-b border-gray-100">
-                        <div class="w-12 h-12 rounded-2xl bg-gray-200"></div>
-                        <div class="flex-1 space-y-2">
-                            <div class="h-4 bg-gray-200 rounded w-48"></div>
-                            <div class="h-3 bg-gray-200 rounded w-24"></div>
-                        </div>
-                        <div class="h-4 bg-gray-200 rounded w-24"></div>
-                        <div class="h-4 bg-gray-200 rounded w-20"></div>
-                        <div class="h-4 bg-gray-200 rounded w-32"></div>
-                        <div class="h-4 bg-gray-200 rounded w-12"></div>
-                    </div>
-                </div>
-            </div>
+        <div v-if="loading && products.length === 0" class="p-32 flex flex-col items-center justify-center gap-6">
+          <div class="relative">
+            <div class="w-20 h-20 border-4 border-slate-100 rounded-full"></div>
+            <div class="w-20 h-20 border-4 border-blue-600 rounded-full border-t-transparent animate-spin absolute top-0"></div>
+          </div>
+          <p class="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">Synchronizing Catalog...</p>
         </div>
-        <!-- Stats Overview -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="p-3 bg-blue-50 rounded-2xl">
-                        <Package class="w-6 h-6 text-blue-600" />
+      </div>
+
+      <!-- Quick Update Modal -->
+      <Teleport to="body">
+        <Transition name="modal">
+          <div v-if="showUpdateModal" class="fixed inset-0 z-[100] flex items-center justify-center p-6">
+            <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-xl" @click="showUpdateModal = false"></div>
+            <div class="relative bg-white rounded-[48px] shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-100">
+              <div class="px-10 py-8 border-b border-slate-50 flex items-center justify-between bg-white shrink-0">
+                <h3 class="text-2xl font-black text-slate-900 tracking-tight leading-none">Stock Audit</h3>
+                <button @click="showUpdateModal = false" class="p-3 hover:bg-slate-50 rounded-2xl transition-all text-slate-300">
+                  <X class="w-6 h-6" />
+                </button>
+              </div>
+              <div class="p-10">
+                <div class="mb-10">
+                  <div class="flex items-center gap-6 p-6 bg-slate-50 rounded-[32px] border border-slate-100/50">
+                    <div class="w-16 h-16 rounded-[20px] bg-white flex items-center justify-center shadow-sm">
+                      <Package class="w-8 h-8 text-slate-200" />
                     </div>
-                </div>
-                <div class="text-3xl font-bold text-gray-900">{{ stats.totalItems }}</div>
-                <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mt-1">Total Unique Items</div>
-            </div>
-
-            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="p-3 bg-amber-50 rounded-2xl">
-                        <AlertCircle class="w-6 h-6 text-amber-600" />
+                    <div class="min-w-0">
+                      <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Selected Item</p>
+                      <p class="text-lg font-black text-slate-900 truncate tracking-tight">{{ currentProduct?.name }}</p>
                     </div>
+                  </div>
                 </div>
-                <div class="text-3xl font-bold text-gray-900">{{ stats.lowStock }}</div>
-                <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mt-1">Low Stock Alert</div>
-            </div>
-
-            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="p-3 bg-rose-50 rounded-2xl">
-                        <TrendingDown class="w-6 h-6 text-rose-600" />
-                    </div>
+                <div class="mb-10">
+                  <label class="block text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-4 ml-2">New Unit Count</label>
+                  <div class="relative group">
+                    <Database class="absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 text-slate-300 group-focus-within:text-blue-600 transition-colors" />
+                    <input v-model.number="newStockValue" type="number" min="0"
+                      class="w-full pl-16 pr-6 py-6 bg-slate-50 border-2 border-transparent rounded-[24px] focus:bg-white focus:border-blue-100 transition-all text-2xl font-black text-slate-900 outline-none" />
+                  </div>
+                  <div class="mt-4 flex items-center gap-3 px-4 text-slate-400">
+                    <AlertCircle class="w-4 h-4 shrink-0" />
+                    <p class="text-[10px] font-bold uppercase tracking-widest leading-relaxed">Overwrite current stock quantity in the database.</p>
+                  </div>
                 </div>
-                <div class="text-3xl font-bold text-gray-900">{{ stats.outOfStock }}</div>
-                <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mt-1">Out of Stock</div>
-            </div>
-
-            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-                <div class="flex items-center justify-between mb-4">
-                    <div class="p-3 bg-emerald-50 rounded-2xl">
-                        <TrendingUp class="w-6 h-6 text-emerald-600" />
-                    </div>
+                <div class="flex gap-4">
+                  <button @click="showUpdateModal = false"
+                    class="flex-1 py-5 bg-white border-2 border-slate-100 text-slate-700 rounded-[20px] font-black text-xs uppercase tracking-widest hover:bg-slate-50 transition-all">
+                    Cancel
+                  </button>
+                  <button @click="handleUpdateStock"
+                    class="flex-1 py-5 bg-slate-900 text-white rounded-[20px] font-black text-xs uppercase tracking-widest hover:bg-slate-800 transition-all flex items-center justify-center gap-3 shadow-xl shadow-slate-200"
+                    :disabled="updating">
+                    <Loader2 v-if="updating" class="w-5 h-5 animate-spin" />
+                    Commit Update
+                  </button>
                 </div>
-                <div class="text-3xl font-bold text-gray-900">${{ stats.totalValue.toLocaleString() }}</div>
-                <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mt-1">Total Stock Value</div>
+              </div>
             </div>
-        </div>
-
-        <!-- Filters and Search -->
-        <div
-            class="bg-white text-gray-900 p-6 rounded-[32px] border border-gray-100 shadow-sm mb-8 flex flex-col md:flex-row gap-4 items-center">
-            <div class="flex-1 w-full relative group">
-                <Search
-                    class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
-                <input v-model="searchTerm" type="text" placeholder="Search by product name or SKU..."
-                    class="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-600/20 transition-all" />
-            </div>
-            <div class="flex gap-3 w-full md:w-auto">
-                <div class="flex-1 md:flex-none flex items-center gap-2 px-4 py-1 bg-gray-50 rounded-2xl">
-                    <Filter class="w-4 h-4 text-gray-400" />
-                    <select v-model="selectedStockStatus"
-                        class="bg-transparent border-none py-2 focus:ring-0 text-sm font-bold text-gray-700">
-                        <option value="all">All Status</option>
-                        <option value="healthy">In Stock (>10)</option>
-                        <option value="low">Low Stock (1-10)</option>
-                        <option value="out">Out of Stock (0)</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-
-        <!-- Alert Messages -->
-        <Transition name="slide-fade">
-            <div v-if="error"
-                class="mb-8 p-4 bg-rose-50 border border-rose-200 rounded-2xl flex items-center gap-3 text-rose-800 font-medium shadow-sm">
-                <AlertCircle class="w-5 h-5 shrink-0" />
-                {{ error }}
-            </div>
+          </div>
         </Transition>
-        <Transition name="slide-fade">
-            <div v-if="success"
-                class="mb-8 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-3 text-emerald-800 font-medium shadow-sm">
-                <CheckCircle class="w-5 h-5 shrink-0" />
-                {{ success }}
-            </div>
-        </Transition>
-
-        <!-- Inventory Table -->
-        <div class="bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-gray-50/50 border-b border-gray-100">
-                            <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                                <button @click="toggleSort('name')"
-                                    class="flex items-center gap-1 hover:text-blue-600 transition-colors">
-                                    Product Details
-                                    <ArrowUpDown class="w-3 h-3" />
-                                </button>
-                            </th>
-                            <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">SKU</th>
-                            <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                                <button @click="toggleSort('price')"
-                                    class="flex items-center gap-1 hover:text-blue-600 transition-colors">
-                                    Price
-                                    <ArrowUpDown class="w-3 h-3" />
-                                </button>
-                            </th>
-                            <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                                <button @click="toggleSort('stock')"
-                                    class="flex items-center gap-1 hover:text-blue-600 transition-colors">
-                                    Stock Level
-                                    <ArrowUpDown class="w-3 h-3" />
-                                </button>
-                            </th>
-                            <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-right">
-                                Actions
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-50">
-                        <tr v-for="product in filteredProducts" :key="product.id"
-                            class="hover:bg-gray-50/50 transition-colors group">
-                            <td class="px-8 py-5">
-                                <div class="flex items-center gap-4">
-                                    <div
-                                        class="w-12 h-12 rounded-2xl bg-gray-100 flex items-center justify-center group-hover:bg-white transition-colors">
-                                        <Package class="w-6 h-6 text-gray-400" />
-                                    </div>
-                                    <div>
-                                        <div
-                                            class="font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
-                                            {{ product.name }}</div>
-                                        <div
-                                            class="text-[10px] font-bold text-gray-400 uppercase tracking-tight mt-0.5">
-                                            {{ product.category }}</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-8 py-5 text-gray-500 font-mono text-xs font-bold uppercase tracking-wider">
-                                {{ product.sku || 'N/A' }}
-                            </td>
-                            <td class="px-8 py-5 text-gray-900 font-bold">
-                                ${{ product.price.toLocaleString() }}
-                            </td>
-                            <td class="px-8 py-5">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-32 h-2 bg-gray-100 rounded-full overflow-hidden shrink-0">
-                                        <div class="h-full transition-all duration-700 ease-out"
-                                            :class="product.stock === 0 ? 'bg-rose-500' : product.stock <= 10 ? 'bg-amber-500' : 'bg-emerald-500'"
-                                            :style="{ width: Math.min((product.stock / 100) * 100, 100) + '%' }"></div>
-                                    </div>
-                                    <span class="text-[10px] font-bold uppercase tracking-widest"
-                                        :class="product.stock === 0 ? 'text-rose-600' : product.stock <= 10 ? 'text-amber-600' : 'text-emerald-600'">
-                                        {{ product.stock }} units
-                                    </span>
-                                </div>
-                            </td>
-                            <td class="px-8 py-5 text-right">
-                                <button @click="openUpdateModal(product)"
-                                    class="p-2.5 text-gray-400 hover:text-blue-600 hover:bg-white rounded-xl shadow-sm transition-all border border-transparent hover:border-gray-100"
-                                    title="Quick Update Stock">
-                                    <Edit2 class="w-4 h-4" />
-                                </button>
-                            </td>
-                        </tr>
-                        <tr v-if="filteredProducts.length === 0 && !loading">
-                            <td colspan="5" class="px-8 py-20 text-center">
-                                <div
-                                    class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-300">
-                                    <Database class="w-10 h-10" />
-                                </div>
-                                <p class="text-gray-500 font-medium text-lg mb-2">No inventory items found</p>
-                                <p class="text-sm text-gray-400 mb-4">Try adjusting your filters or search terms</p>
-                                <button @click="searchTerm = ''; selectedStockStatus = 'all'"
-                                    class="px-6 py-2 text-sm font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors">
-                                    Clear all filters
-                                </button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Loading State -->
-            <div v-if="loading" class="p-20 flex flex-col items-center justify-center gap-4">
-                <Loader2 class="w-10 h-10 text-blue-600 animate-spin" />
-                <p class="text-gray-500 font-medium">Synchronizing inventory data...</p>
-            </div>
-        </div>
-
-        <!-- Quick Update Modal -->
-        <Teleport to="body">
-            <Transition name="modal">
-                <div v-if="showUpdateModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" @click="showUpdateModal = false"></div>
-                    <div
-                        class="relative bg-white rounded-[32px] shadow-2xl w-full max-w-md overflow-hidden transform transition-all">
-                        <div class="px-8 py-6 border-b border-gray-50 flex items-center justify-between">
-                            <h3 class="text-xl font-bold text-gray-900">Update Stock Level</h3>
-                            <button @click="showUpdateModal = false"
-                                class="p-2 hover:bg-gray-100 rounded-xl transition-colors text-gray-400">
-                                <X class="w-5 h-5" />
-                            </button>
-                        </div>
-                        <div class="p-8">
-                            <div class="mb-8">
-                                <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-2xl">
-                                    <div
-                                        class="w-12 h-12 rounded-xl bg-white flex items-center justify-center shadow-sm">
-                                        <Package class="w-6 h-6 text-gray-400" />
-                                    </div>
-                                    <div>
-                                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Product
-                                        </p>
-                                        <p class="text-gray-900 font-bold">{{ currentProduct?.name }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mb-8">
-                                <label
-                                    class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Adjust
-                                    Quantity</label>
-                                <div class="relative group">
-                                    <Database
-                                        class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
-                                    <input v-model.number="newStockValue" type="number" min="0"
-                                        class="w-full pl-12 pr-4 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-600/20 text-lg font-bold" />
-                                </div>
-                                <p class="mt-3 text-xs text-gray-500 font-medium flex items-center gap-2">
-                                    <AlertCircle class="w-3.5 h-3.5" />
-                                    Update total current stock count for this SKU.
-                                </p>
-                            </div>
-                            <div class="flex gap-3">
-                                <button @click="showUpdateModal = false"
-                                    class="flex-1 py-4 bg-gray-50 text-gray-700 rounded-2xl font-bold hover:bg-gray-100 transition-colors">
-                                    Cancel
-                                </button>
-                                <button @click="handleUpdateStock"
-                                    class="flex-1 py-4 bg-gray-900 text-white rounded-2xl font-bold hover:bg-gray-800 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-gray-200"
-                                    :disabled="updating">
-                                    <Loader2 v-if="updating" class="w-4 h-4 animate-spin" />
-                                    Update Count
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </Transition>
-        </Teleport>
+      </Teleport>
     </div>
+  </div>
 </template>
 
 <style scoped>

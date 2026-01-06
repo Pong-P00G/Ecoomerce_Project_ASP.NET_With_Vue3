@@ -141,286 +141,296 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="p-4 sm:p-6 lg:p-8 max-w-1600px mx-auto">
-    <!-- Error Banner -->
-    <div v-if="error" class="mb-6 bg-red-50 border border-red-200 rounded-2xl p-4 flex items-center gap-3">
-      <AlertTriangle class="w-5 h-5 text-red-600 shrink-0" />
-      <div class="flex-1">
-        <p class="text-sm font-semibold text-red-900">Error loading dashboard</p>
-        <p class="text-xs text-red-700 mt-0.5">{{ error }}</p>
-      </div>
-      <button @click="fetchDashboardData()" class="text-sm font-medium text-red-700 hover:text-red-900 underline">
-        Retry
-      </button>
-    </div>
-    <div class="flex flex-col lg:flex-row gap-6 lg:gap-8">
-      <!-- Main Dashboard Content -->
-      <div class="flex-1 space-y-6 lg:space-y-8">
-        <!-- Welcome Header -->
-        <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-          <div>
-            <h2 class="text-2xl sm:text-3xl font-bold text-gray-900">Dashboard Overview</h2>
-            <p class="text-gray-500 mt-1 text-sm sm:text-base">Welcome back! Here's what's happening today.</p>
+  <div class="min-h-screen bg-slate-50/50 p-4 sm:p-6 lg:p-8">
+    <div class="max-w-[1600px] mx-auto">
+      <!-- Error Banner -->
+      <Transition name="slide-down">
+        <div v-if="error" class="mb-8 bg-rose-50 border border-rose-100 rounded-3xl p-5 flex items-center gap-4 shadow-sm">
+          <div class="p-3 bg-white rounded-2xl shadow-sm">
+            <AlertTriangle class="w-6 h-6 text-rose-500 shrink-0" />
           </div>
-          <div class="flex items-center gap-3">
-            <button @click="refreshData" :disabled="refreshing || loading"
-              class="flex items-center gap-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 px-4 py-2 rounded-full hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-              <RefreshCw class="w-4 h-4" :class="{ 'animate-spin': refreshing }" />
-              Refresh
-            </button>
-            <div class="flex items-center gap-2 text-sm font-medium text-blue-600 bg-blue-50 px-4 py-2 rounded-full">
-              <Activity class="w-4 h-4" />
-              Live Updates
-            </div>
+          <div class="flex-1">
+            <p class="text-sm font-bold text-slate-900">System Notification</p>
+            <p class="text-xs text-slate-500 mt-0.5">{{ error }}</p>
           </div>
+          <button @click="fetchDashboardData()" class="px-5 py-2.5 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-all text-sm font-bold shadow-sm">
+            Retry
+          </button>
         </div>
-        <!-- Loading Skeleton -->
-        <div v-if="loading" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
-          <div v-for="i in 4" :key="i" class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm animate-pulse">
-            <div class="flex items-start justify-between">
-              <div class="w-12 h-12 rounded-2xl bg-gray-200"></div>
-              <div class="w-16 h-6 bg-gray-200 rounded-lg"></div>
+      </Transition>
+
+      <div class="flex flex-col lg:flex-row gap-8">
+        <!-- Main Dashboard Content -->
+        <div class="flex-1 space-y-8">
+          <!-- Welcome Header -->
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+            <div>
+              <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Dashboard</h2>
+              <p class="text-slate-500 mt-1 font-medium">Monitoring your store's performance in real-time.</p>
             </div>
-            <div class="mt-4 space-y-2">
-              <div class="h-4 bg-gray-200 rounded w-24"></div>
-              <div class="h-8 bg-gray-200 rounded w-32"></div>
-            </div>
-          </div>
-        </div>
-        <!-- Stats Grid -->
-        <div v-else class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
-          <div v-for="(stat, index) in [
-            { label: 'Total Revenue', value: '$' + stats.totalRevenue.toLocaleString(), icon: DollarSign, color: 'blue', trend: stats.revenueTrend },
-            { label: 'Active Users', value: stats.totalUsers, icon: Users, color: 'indigo', trend: stats.usersTrend },
-            { label: 'Total Products', value: stats.totalProducts, icon: Package, color: 'purple', trend: stats.productsTrend },
-            { label: 'Low Stock', value: stats.lowStock, icon: AlertCircle, color: 'amber', trend: stats.outOfStock + ' empty' }
-          ]" :key="index"
-            class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 cursor-default">
-            <div class="flex items-start justify-between">
-              <div :class="`w-12 h-12 rounded-2xl flex items-center justify-center`"
-                :style="{ backgroundColor: stat.color === 'blue' ? '#eff6ff' : stat.color === 'indigo' ? '#eef2ff' : stat.color === 'purple' ? '#f5f3ff' : '#fffbeb' }">
-                <component :is="stat.icon" class="w-6 h-6"
-                  :style="{ color: stat.color === 'blue' ? '#2563eb' : stat.color === 'indigo' ? '#4f46e5' : stat.color === 'purple' ? '#7c3aed' : '#d97706' }" />
-              </div>
-              <span
-                :class="`text-xs font-bold px-2 py-1 rounded-lg ${stat.color === 'amber' ? 'bg-amber-50 text-amber-700' : 'bg-green-50 text-green-700'}`">
-                {{ stat.trend }}
-              </span>
-            </div>
-            <div class="mt-4">
-              <p class="text-sm font-medium text-gray-500">{{ stat.label }}</p>
-              <p class="text-2xl font-bold text-gray-900 mt-1">{{ stat.value }}</p>
-            </div>
-          </div>
-        </div>
-        <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 lg:gap-8">
-          <!-- Recent Products -->
-          <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
-            <div class="p-6 border-b border-gray-50 flex items-center justify-between">
-              <h3 class="font-bold text-gray-900 flex items-center gap-2">
-                <Package class="w-5 h-5 text-blue-600" />
-                Recent Products
-              </h3>
-              <router-link to="/admin/product"
-                class="text-sm font-semibold text-blue-600 hover:underline flex items-center gap-1 transition-colors">
-                View All
-                <ArrowRight class="w-4 h-4" />
-              </router-link>
-            </div>
-            <div class="p-2 grow overflow-y-auto max-h-500px">
-              <div v-if="loading" class="space-y-1 p-2">
-                <div v-for="i in 5" :key="i" class="flex items-center gap-4 p-3 rounded-2xl animate-pulse">
-                  <div class="w-12 h-12 rounded-xl bg-gray-200"></div>
-                  <div class="flex-1 space-y-2">
-                    <div class="h-4 bg-gray-200 rounded w-3/4"></div>
-                    <div class="h-3 bg-gray-200 rounded w-1/2"></div>
-                  </div>
-                  <div class="w-16 h-6 bg-gray-200 rounded"></div>
-                </div>
-              </div>
-              <div v-else-if="products.length === 0" class="p-8 text-center">
-                <Package class="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p class="text-sm text-gray-500">No products found</p>
-              </div>
-              <div v-else class="space-y-1">
-                <div v-for="product in products.slice(0, 5)" :key="product.id"
-                  @click="selectPreview(product, 'product')" :class="[
-                    'flex items-center gap-4 p-3 rounded-2xl cursor-pointer transition-all',
-                    selectedItem?.id === product.id && previewType === 'product' ? 'bg-blue-50 border-2 border-blue-200' : 'hover:bg-gray-50 border-2 border-transparent'
-                  ]">
-                  <div class="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center text-gray-400 shrink-0">
-                    <Package class="w-6 h-6" />
-                  </div>
-                  <div class="flex-1 min-w-0">
-                    <p class="font-semibold text-gray-900 truncate">{{ product.name }}</p>
-                    <p class="text-xs text-gray-500">{{ product.category || 'Uncategorized' }}</p>
-                  </div>
-                  <div class="text-right shrink-0">
-                    <p class="font-bold text-gray-900">${{ (product.price || 0).toLocaleString() }}</p>
-                    <p
-                      :class="`text-[10px] font-bold uppercase ${(product.stock || 0) < 10 ? 'text-red-500' : 'text-green-500'}`">
-                      {{ product.stock || 0 }} in stock
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <!-- Recent Activity -->
-          <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden flex flex-col">
-            <div class="p-6 border-b border-gray-50 flex items-center justify-between">
-              <h3 class="font-bold text-gray-900 flex items-center gap-2">
-                <Clock class="w-5 h-5 text-indigo-600" />
-                Recent Activity
-              </h3>
-              <button v-if="recentActivities.length > 0" @click="clearActivities"
-                class="text-sm font-semibold text-gray-400 hover:text-gray-600 transition-colors">
-                Clear
+            <div class="flex items-center gap-3">
+              <button @click="refreshData" :disabled="refreshing || loading"
+                class="flex items-center gap-2 text-sm font-bold text-slate-700 bg-white border border-slate-200 px-5 py-2.5 rounded-2xl hover:bg-slate-50 transition-all shadow-sm active:scale-95 disabled:opacity-50">
+                <RefreshCw class="w-4 h-4" :class="{ 'animate-spin': refreshing }" />
+                Sync Data
               </button>
+              <div class="flex items-center gap-2 text-sm font-bold text-emerald-600 bg-emerald-50 px-5 py-2.5 rounded-2xl border border-emerald-100/50">
+                <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                Live
+              </div>
             </div>
-            <div class="p-6 overflow-y-auto max-h-500px">
-              <div v-if="loading" class="space-y-6">
-                <div v-for="i in 4" :key="i" class="flex gap-4 animate-pulse">
-                  <div class="w-10 h-10 rounded-full bg-gray-200 shrink-0"></div>
-                  <div class="flex-1 space-y-2">
-                    <div class="h-4 bg-gray-200 rounded w-3/4"></div>
-                    <div class="h-3 bg-gray-200 rounded w-1/2"></div>
+          </div>
+
+          <!-- Stats Grid -->
+          <div v-if="loading" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+            <div v-for="i in 4" :key="i" class="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm animate-pulse">
+              <div class="flex items-start justify-between mb-4">
+                <div class="w-12 h-12 rounded-2xl bg-slate-100"></div>
+                <div class="w-16 h-6 bg-slate-100 rounded-lg"></div>
+              </div>
+              <div class="space-y-3">
+                <div class="h-4 bg-slate-100 rounded w-24"></div>
+                <div class="h-8 bg-slate-100 rounded w-32"></div>
+              </div>
+            </div>
+          </div>
+          <div v-else class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+            <div v-for="(stat, index) in [
+              { label: 'Total Revenue', value: '$' + stats.totalRevenue.toLocaleString(), icon: DollarSign, color: 'blue', trend: stats.revenueTrend, bg: 'bg-blue-50', text: 'text-blue-600' },
+              { label: 'Active Users', value: stats.totalUsers, icon: Users, color: 'indigo', trend: stats.usersTrend, bg: 'bg-indigo-50', text: 'text-indigo-600' },
+              { label: 'Total Products', value: stats.totalProducts, icon: Package, color: 'purple', trend: stats.productsTrend, bg: 'bg-purple-50', text: 'text-purple-600' },
+              { label: 'Stock Alerts', value: stats.lowStock, icon: AlertCircle, color: 'amber', trend: stats.outOfStock + ' out', bg: 'bg-amber-50', text: 'text-amber-600' }
+            ]" :key="index"
+              class="group bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+              <div class="flex items-start justify-between">
+                <div :class="`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors ${stat.bg}`">
+                  <component :is="stat.icon" :class="`w-7 h-7 ${stat.text}`" />
+                </div>
+                <div :class="`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-wider ${stat.color === 'amber' ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600'}`">
+                  {{ stat.trend }}
+                </div>
+              </div>
+              <div class="mt-6">
+                <p class="text-sm font-bold text-slate-400 uppercase tracking-widest">{{ stat.label }}</p>
+                <p class="text-3xl font-black text-slate-900 mt-1 tracking-tight">{{ stat.value }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
+            <!-- Recent Products -->
+            <div class="bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden flex flex-col">
+              <div class="p-8 border-b border-slate-50 flex items-center justify-between">
+                <div>
+                  <h3 class="font-black text-slate-900 text-lg flex items-center gap-3">
+                    <div class="p-2 bg-blue-50 rounded-lg">
+                      <Package class="w-5 h-5 text-blue-600" />
+                    </div>
+                    Recent Products
+                  </h3>
+                </div>
+                <router-link to="/admin/product"
+                  class="group text-sm font-bold text-blue-600 hover:text-blue-700 flex items-center gap-2 transition-colors">
+                  View Inventory
+                  <ArrowRight class="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                </router-link>
+              </div>
+              <div class="p-4 grow overflow-y-auto max-h-[500px]">
+                <div v-if="loading" class="space-y-2">
+                  <div v-for="i in 5" :key="i" class="flex items-center gap-4 p-4 rounded-2xl animate-pulse">
+                    <div class="w-14 h-14 rounded-2xl bg-slate-100"></div>
+                    <div class="flex-1 space-y-3">
+                      <div class="h-4 bg-slate-100 rounded w-3/4"></div>
+                      <div class="h-3 bg-slate-100 rounded w-1/2"></div>
+                    </div>
+                  </div>
+                </div>
+                <div v-else-if="products.length === 0" class="py-20 text-center">
+                  <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Package class="w-10 h-10 text-slate-200" />
+                  </div>
+                  <p class="text-slate-400 font-bold">No products available</p>
+                </div>
+                <div v-else class="space-y-2">
+                  <div v-for="product in products.slice(0, 5)" :key="product.id"
+                    @click="selectPreview(product, 'product')" :class="[
+                      'flex items-center gap-4 p-4 rounded-2xl cursor-pointer transition-all duration-200 border-2',
+                      selectedItem?.id === product.id && previewType === 'product' ? 'bg-blue-50/50 border-blue-100 shadow-sm' : 'hover:bg-slate-50 border-transparent'
+                    ]">
+                    <div class="w-14 h-14 rounded-2xl bg-white shadow-sm flex items-center justify-center text-slate-300 shrink-0 border border-slate-100">
+                      <Package class="w-7 h-7" />
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <p class="font-bold text-slate-900 truncate">{{ product.name }}</p>
+                      <p class="text-xs font-bold text-slate-400 uppercase tracking-tighter mt-0.5">{{ product.category || 'General' }}</p>
+                    </div>
+                    <div class="text-right shrink-0">
+                      <p class="font-black text-slate-900">${{ (product.price || 0).toLocaleString() }}</p>
+                      <div :class="`inline-flex items-center mt-1 px-2 py-0.5 rounded-lg text-[10px] font-black uppercase tracking-tighter ${(product.stock || 0) < 10 ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600'}`">
+                        {{ product.stock || 0 }} Unit
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-              <div v-else-if="recentActivities.length === 0" class="text-center py-8">
-                <Clock class="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p class="text-sm text-gray-500">No recent activity</p>
-              </div>
-              <div v-else class="space-y-6">
-                <div v-for="(activity, index) in recentActivities" :key="activity.id || index" class="flex gap-4">
-                  <div class="relative">
-                    <div :class="[
-                      'w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors',
-                      activity.status === 'new' ? 'bg-blue-100 text-blue-600' :
-                        activity.status === 'warning' ? 'bg-amber-100 text-amber-600' : 'bg-gray-100 text-gray-600'
-                    ]">
-                      <Activity class="w-5 h-5" />
-                    </div>
-                    <div v-if="index < recentActivities.length - 1"
-                      class="absolute top-8 left-1/2 -translate-x-1/2 w-0.5 h-6 bg-gray-100"></div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="bg-white rounded-[32px] border border-slate-100 shadow-sm overflow-hidden flex flex-col">
+              <div class="p-8 border-b border-slate-50 flex items-center justify-between">
+                <h3 class="font-black text-slate-900 text-lg flex items-center gap-3">
+                  <div class="p-2 bg-indigo-50 rounded-lg">
+                    <Clock class="w-5 h-5 text-indigo-600" />
                   </div>
-                  <div class="flex-1 pt-0.5">
-                    <p class="text-sm font-semibold text-gray-900">{{ activity.message }}</p>
-                    <p class="text-xs text-gray-500 mt-0.5">{{ activity.time ? (activity.time.includes('ago') ?
-                      activity.time : formatRelativeTime(activity.time)) : 'Unknown time' }}</p>
+                  System Logs
+                </h3>
+                <button v-if="recentActivities.length > 0" @click="clearActivities"
+                  class="text-xs font-black text-slate-400 hover:text-rose-500 uppercase tracking-widest transition-colors">
+                  Clear Logs
+                </button>
+              </div>
+              <div class="p-8 overflow-y-auto max-h-[500px]">
+                <div v-if="loading" class="space-y-8">
+                  <div v-for="i in 4" :key="i" class="flex gap-6 animate-pulse">
+                    <div class="w-12 h-12 rounded-full bg-slate-100 shrink-0"></div>
+                    <div class="flex-1 space-y-3">
+                      <div class="h-4 bg-slate-100 rounded w-3/4"></div>
+                      <div class="h-3 bg-slate-100 rounded w-1/4"></div>
+                    </div>
+                  </div>
+                </div>
+                <div v-else-if="recentActivities.length === 0" class="py-20 text-center">
+                  <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Activity class="w-10 h-10 text-slate-200" />
+                  </div>
+                  <p class="text-slate-400 font-bold">No recent activities</p>
+                </div>
+                <div v-else class="space-y-8">
+                  <div v-for="(activity, index) in recentActivities" :key="activity.id || index" class="flex gap-6 relative">
+                    <div v-if="index < recentActivities.length - 1"
+                      class="absolute top-12 left-6 -translate-x-1/2 w-px h-8 bg-slate-100"></div>
+                    <div class="relative shrink-0">
+                      <div :class="[
+                        'w-12 h-12 rounded-2xl flex items-center justify-center shadow-sm border border-white',
+                        activity.status === 'new' ? 'bg-blue-500 text-white' :
+                          activity.status === 'warning' ? 'bg-amber-500 text-white' : 'bg-slate-900 text-white'
+                      ]">
+                        <component :is="activity.type === 'order' ? DollarSign : activity.type === 'user' ? Users : activity.type === 'stock' ? AlertTriangle : Activity" class="w-5 h-5" />
+                      </div>
+                    </div>
+                    <div class="flex-1 pt-1">
+                      <p class="text-sm font-bold text-slate-900 leading-snug">{{ activity.message }}</p>
+                      <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1.5 flex items-center gap-2">
+                        <Clock class="w-3 h-3" />
+                        {{ activity.time ? (activity.time.includes('ago') ? activity.time : formatRelativeTime(activity.time)) : 'Now' }}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-      <!-- Right Side Preview Panel -->
-      <div class="w-full lg:w-80 xl:w-96 shrink-0">
-        <div class="sticky top-24 space-y-6">
-          <div class="bg-white rounded-32px border border-gray-100 shadow-xl overflow-hidden">
-            <!-- Preview Header -->
-            <div class="h-32 bg-linear-to-br from-blue-600 to-indigo-700 relative">
-              <div class="absolute -bottom-8 left-8 w-24 h-24 rounded-3xl bg-white shadow-lg p-1">
-                <div class="w-full h-full rounded-2xl bg-gray-50 flex items-center justify-center">
-                  <component :is="previewType === 'product' ? Package : Users" class="w-10 h-10 text-gray-300" />
+
+        <!-- Right Side Preview Panel -->
+        <div class="w-full lg:w-96 shrink-0">
+          <div class="sticky top-8 space-y-8">
+            <div class="bg-white rounded-[40px] border border-slate-100 shadow-xl shadow-slate-200/50 overflow-hidden group">
+              <!-- Preview Header -->
+              <div class="h-40 bg-slate-900 relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-indigo-600/20"></div>
+                <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-white/5 rounded-full blur-3xl"></div>
+                <div class="absolute -bottom-12 left-10 w-32 h-32 rounded-[32px] bg-white shadow-2xl p-1.5 transition-transform group-hover:scale-105 duration-500">
+                  <div class="w-full h-full rounded-[24px] bg-slate-50 flex items-center justify-center">
+                    <component :is="previewType === 'product' ? Package : Users" class="w-12 h-12 text-slate-200" />
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="pt-16 p-6 lg:p-8">
-              <div v-if="!selectedItem" class="text-center py-8">
-                <Package class="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p class="text-sm text-gray-500">Select an item to view details</p>
-              </div>
-              <div v-else>
-                <div class="flex items-start justify-between">
-                  <div class="flex-1 min-w-0">
-                    <h4 class="text-xl lg:text-2xl font-bold text-gray-900 truncate">{{ selectedItem?.name || 'Select anyItem' }}</h4>
-                    <p class="text-gray-500 mt-1 flex items-center gap-2 flex-wrap">
-                      <span v-if="previewType === 'product'"
-                        class="bg-blue-50 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded uppercase">
-                        {{ selectedItem?.category || 'Uncategorized' }}
-                      </span>
-                      <span v-else
-                        class="bg-purple-50 text-purple-700 text-[10px] font-bold px-2 py-0.5 rounded uppercase">
-                        {{ selectedItem?.role || 'User' }}
-                      </span>
-                      <span class="text-gray-300">•</span>
-                      <span class="text-xs font-medium truncate">{{ previewType === 'product' ? (selectedItem?.sku || 'N/A') : (selectedItem?.email || 'N/A') }}</span>
-                    </p>
-                  </div>
-                  <button class="p-2 hover:bg-gray-100 rounded-xl transition-colors shrink-0 ml-2">
-                    <ExternalLink class="w-5 h-5 text-gray-400" />
-                  </button>
+              <div class="pt-24 p-10">
+                <div v-if="!selectedItem" class="text-center py-10">
+                  <p class="text-slate-400 font-bold">Select an item to preview</p>
                 </div>
-                <!-- Details -->
-                <div class="mt-6 lg:mt-8 space-y-6">
-                  <div v-if="previewType === 'product'" class="grid grid-cols-2 gap-4">
-                    <div class="bg-gray-50 p-4 rounded-2xl">
-                      <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Price</p>
-                      <p class="text-lg font-bold text-gray-900 mt-1">${{ (selectedItem?.price || 0).toLocaleString() }}
-                      </p>
-                    </div>
-                    <div class="bg-gray-50 p-4 rounded-2xl">
-                      <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Inventory</p>
-                      <p
-                        :class="['text-lg font-bold mt-1', (selectedItem?.stock || 0) < 10 ? 'text-red-500' : 'text-green-600']">
-                        {{ selectedItem?.stock || 0 }} units
-                      </p>
+                <div v-else>
+                  <div class="flex items-start justify-between">
+                    <div class="flex-1 min-w-0">
+                      <h4 class="text-2xl font-black text-slate-900 truncate tracking-tight">{{ selectedItem?.name || 'Unknown' }}</h4>
+                      <div class="flex items-center gap-2 mt-2">
+                        <span :class="`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest ${previewType === 'product' ? 'bg-blue-50 text-blue-600' : 'bg-indigo-50 text-indigo-600'}`">
+                          {{ previewType === 'product' ? (selectedItem?.category || 'General') : (selectedItem?.role || 'User') }}
+                        </span>
+                        <span class="text-slate-300 font-light">|</span>
+                        <span class="text-xs font-bold text-slate-400 truncate">{{ previewType === 'product' ? (selectedItem?.sku || 'NO-SKU') : (selectedItem?.email || 'no-email') }}</span>
+                      </div>
                     </div>
                   </div>
-                  <div v-if="previewType === 'user'" class="space-y-4">
-                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
-                      <span class="text-sm font-medium text-gray-500">Status</span>
-                      <span :class="[
-                        'px-3 py-1 rounded-full text-xs font-bold',
-                        selectedItem?.status === 'Active' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
-                      ]">
-                        {{ selectedItem?.status || 'Unknown' }}
-                      </span>
+
+                  <!-- Details -->
+                  <div class="mt-10 space-y-8">
+                    <div v-if="previewType === 'product'" class="grid grid-cols-2 gap-4">
+                      <div class="bg-slate-50 p-5 rounded-3xl border border-slate-100/50">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Pricing</p>
+                        <p class="text-xl font-black text-slate-900 mt-1">${{ (selectedItem?.price || 0).toLocaleString() }}</p>
+                      </div>
+                      <div class="bg-slate-50 p-5 rounded-3xl border border-slate-100/50">
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">In Stock</p>
+                        <p :class="['text-xl font-black mt-1', (selectedItem?.stock || 0) < 10 ? 'text-rose-500' : 'text-emerald-600']">
+                          {{ selectedItem?.stock || 0 }} <span class="text-xs uppercase">Qty</span>
+                        </p>
+                      </div>
                     </div>
-                    <div class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
-                      <span class="text-sm font-medium text-gray-500">Joined</span>
-                      <span class="text-sm font-bold text-gray-900">{{ formatDate(selectedItem?.joined) }}</span>
+
+                    <div v-if="previewType === 'user'" class="space-y-4">
+                      <div class="flex items-center justify-between p-5 bg-slate-50 rounded-3xl border border-slate-100/50">
+                        <span class="text-xs font-black text-slate-400 uppercase tracking-widest">Account Status</span>
+                        <span :class="`px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-widest ${selectedItem?.status === 'Active' ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-500'}`">
+                          {{ selectedItem?.status || 'Inactive' }}
+                        </span>
+                      </div>
+                      <div class="flex items-center justify-between p-5 bg-slate-50 rounded-3xl border border-slate-100/50">
+                        <span class="text-xs font-black text-slate-400 uppercase tracking-widest">Member Since</span>
+                        <span class="text-sm font-bold text-slate-900">{{ formatDate(selectedItem?.joined) }}</span>
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    <h5 class="text-sm font-bold text-gray-900 mb-3">Quick Actions</h5>
-                    <div class="grid grid-cols-1 gap-2">
+
+                    <div class="space-y-3">
                       <button
                         @click="previewType === 'product' ? $router.push(`/admin/product?edit=${selectedItem?.id}`) : $router.push(`/admin/user?edit=${selectedItem?.id}`)"
-                        class="w-full flex items-center justify-center gap-2 py-3 bg-gray-900 text-white rounded-2xl font-bold hover:bg-gray-800 transition-colors">
-                        Edit {{ previewType === 'product' ? 'Product' : 'User' }}
+                        class="w-full py-4 bg-slate-900 text-white rounded-[20px] font-black uppercase tracking-widest text-xs hover:bg-slate-800 transition-all shadow-lg shadow-slate-200 active:scale-[0.98]">
+                        Modify Profile
                       </button>
                       <button
-                        class="w-full py-3 bg-white border border-gray-200 text-gray-700 rounded-2xl font-bold hover:bg-gray-50 transition-colors">
-                        {{ previewType === 'product' ? 'View Inventory' : 'Reset Password' }}
+                        class="w-full py-4 bg-white border-2 border-slate-100 text-slate-700 rounded-[20px] font-black uppercase tracking-widest text-xs hover:bg-slate-50 transition-all active:scale-[0.98]">
+                        {{ previewType === 'product' ? 'View Full Analytics' : 'Security Settings' }}
                       </button>
                     </div>
-                  </div>
-                  <div v-if="previewType === 'product' && selectedItem?.description"
-                    class="pt-4 border-t border-gray-100">
-                    <p class="text-sm text-gray-500 leading-relaxed italic">
-                      "{{ selectedItem.description }}"
-                    </p>
+
+                    <div v-if="previewType === 'product' && selectedItem?.description" class="pt-6 border-t border-slate-100">
+                      <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Description</p>
+                      <p class="text-sm text-slate-500 leading-relaxed italic">
+                        "{{ selectedItem.description }}"
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-          <!-- Quick Stats Mini Card -->
-          <div class="bg-linear-to-br from-indigo-600 to-purple-700 p-6 lg:p-8 rounded-32px text-white shadow-lg relative overflow-hidden">
-            <TrendingUp class="absolute -right-4 -bottom-4 w-32 h-32 text-white/10" />
-            <h5 class="font-bold text-indigo-100 text-sm lg:text-base">Monthly Growth</h5>
-            <div class="mt-4 flex items-end gap-2">
-              <p class="text-3xl lg:text-4xl font-bold">{{ dashboardData?.monthlyGrowth || '+24%' }}</p>
-              <p class="text-indigo-200 text-xs lg:text-sm mb-1 pb-1">since last month</p>
-            </div>
-            <div class="mt-6 flex gap-1 h-16">
-              <div v-for="(h, index) in (dashboardData?.growthChart || [40, 70, 45, 90, 65, 80, 100])" :key="index"
-                 class="flex-1 bg-white/20 rounded-t-sm transition-all duration-300 hover:bg-white/30"
-                :style="{ height: h + '%' }">
+
+            <!-- Growth Card -->
+            <div class="bg-indigo-600 p-8 rounded-[40px] text-white shadow-xl shadow-indigo-200 relative overflow-hidden group">
+              <div class="absolute top-0 right-0 p-8">
+                <TrendingUp class="w-8 h-8 text-white/20" />
+              </div>
+              <p class="text-[10px] font-black text-indigo-100 uppercase tracking-widest">Performance</p>
+              <h5 class="text-2xl font-black mt-1">Growth Index</h5>
+              <div class="mt-8 flex items-end gap-3">
+                <p class="text-5xl font-black tracking-tighter">{{ dashboardData?.monthlyGrowth || '+24%' }}</p>
+                <p class="text-indigo-100/60 text-xs font-bold uppercase tracking-widest mb-2">Net increase</p>
+              </div>
+              <div class="mt-10 flex items-end gap-1.5 h-16">
+                <div v-for="(h, index) in (dashboardData?.growthChart || [40, 70, 45, 90, 65, 80, 100])" :key="index"
+                  class="flex-1 bg-white/20 rounded-lg transition-all duration-500 group-hover:bg-white/40"
+                  :style="{ height: h + '%' }">
+                </div>
               </div>
             </div>
           </div>

@@ -41,7 +41,7 @@ onUnmounted(() => {
         <!-- Scroll to Top Button (Optional) -->
         <transition name="fade">
             <button v-if="scrollY > 300" @click="scrollToTop"
-                class="fixed bottom-8 right-8 z-40 w-12 h-12 bg-linear-to-br from-violet-600 to-purple-600 text-white rounded-full shadow-2xl hover:shadow-violet-600/50 hover:scale-110 transition-all duration-300 flex items-center justify-center group"
+                class="fixed bottom-8 right-8 z-40 w-10 h-10 bg-black text-white rounded-full shadow-2xl hover:shadow-violet-600/50 hover:scale-110 transition-all duration-300 flex items-center justify-center group"
                 aria-label="Scroll to top">
                 <svg class="w-6 h-6 group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor"
                     viewBox="0 0 24 24">

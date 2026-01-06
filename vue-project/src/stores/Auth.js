@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { authApi } from '../api/authApi'
+import { authAPI } from '../api/authApi'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -18,7 +18,7 @@ export const useAuthStore = defineStore('auth', {
   actions: {
     async register(registerData) {
       try {
-        const response = await authApi.register(registerData)
+        const response = await authAPI.register(registerData)
         if (response.data.succeeded) {
           this.setAuth(response.data.data)
           return response.data
@@ -30,7 +30,7 @@ export const useAuthStore = defineStore('auth', {
 
     async login(credentials) {
       try {
-        const response = await authApi.login(credentials)
+        const response = await authAPI.login(credentials)
         if (response.data.succeeded) {
           this.setAuth(response.data.data)
           return response.data
@@ -42,7 +42,7 @@ export const useAuthStore = defineStore('auth', {
 
     async logout() {
       try {
-        await authApi.logout()
+        await authAPI.logout()
       } catch (error) {
         console.error('Logout error:', error)
       } finally {
@@ -52,7 +52,7 @@ export const useAuthStore = defineStore('auth', {
 
     async refreshToken() {
       try {
-        const response = await authApi.refreshToken(this.refreshToken)
+        const response = await authAPI.refreshToken(this.refreshToken)
         if (response.data.succeeded) {
           this.setAuth(response.data.data)
           return response.data.data.accessToken
@@ -65,7 +65,7 @@ export const useAuthStore = defineStore('auth', {
 
     async getCurrentUser() {
       try {
-        const response = await authApi.getCurrentUser()
+        const response = await authAPI.getCurrentUser()
         if (response.data.succeeded) {
           this.user = response.data.data
           this.isAuthenticated = true
@@ -77,21 +77,21 @@ export const useAuthStore = defineStore('auth', {
 
     async forgotPassword(email) {
       try {
-        const response = await authApi.forgotPassword({ email })
+        const response = await authAPI.forgotPassword({ email })
         return response.data
       } catch (error) {
         throw new Error(error.response?.data?.message || 'Failed to send reset email')
       }
     },
 
-    async resetPassword(resetData) {
-      try {
-        const response = await authApi.resetPassword(resetData)
-        return response.data
-      } catch (error) {
-        throw new Error(error.response?.data?.message || 'Password reset failed')
-      }
-    },
+    // async resetPassword(resetData) {
+    //   try {
+    //     const response = await authAPI.resetPassword(resetData)
+    //     return response.data
+    //   } catch (error) {
+    //     throw new Error(error.response?.data?.message || 'Password reset failed')
+    //   }
+    // },
 
     setAuth(authData) {
       this.accessToken = authData.accessToken

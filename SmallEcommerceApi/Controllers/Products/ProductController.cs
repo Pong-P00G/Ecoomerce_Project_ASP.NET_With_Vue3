@@ -134,13 +134,13 @@ namespace SmallEcommerceApi.Controllers.Products
                     _db.ProductVariants.Add(pv);
                     await _db.SaveChangesAsync();
 
-                    // 2️⃣ Handle Variant Options
+                    // Handle Variant Options
                     foreach (var opt in v.Options)
                     {
                         if (string.IsNullOrWhiteSpace(opt.Variant) || string.IsNullOrWhiteSpace(opt.Value))
                             return BadRequest(new { message = "Variant option name and value are required" });
 
-                        // 🔹 Variant (Color, Size, DPI)
+                        // Variant (Color, Size, DPI)
                         var variant = await _db.Variants
                             .FirstOrDefaultAsync(x => x.Name == opt.Variant.Trim());
 
@@ -152,7 +152,7 @@ namespace SmallEcommerceApi.Controllers.Products
                                 CreatedAt = DateTime.UtcNow
                             };
                             _db.Variants.Add(variant);
-                            await _db.SaveChangesAsync(); // ✅ REQUIRED
+                            await _db.SaveChangesAsync(); // REQUIRED
                         }
 
                         // 🔹 VariantOption (Black, XL, 1600)
@@ -246,7 +246,6 @@ namespace SmallEcommerceApi.Controllers.Products
 
             var totalItems = await query.CountAsync();
 
-            // ⭐ FIX: Calculate stock status in SQL using CASE expression
             var products = await query
                 .OrderByDescending(p => p.CreatedAt)
                 .Skip((page - 1) * pageSize)
@@ -284,7 +283,7 @@ namespace SmallEcommerceApi.Controllers.Products
                 })
                 .ToListAsync();
 
-            // ⭐ Map to ProductResponseDto
+            // Map to ProductResponseDto
             var productDtos = products.Select(p => new ProductResponseDto
             {
                 ProductId = p.ProductId,
@@ -319,10 +318,8 @@ namespace SmallEcommerceApi.Controllers.Products
         public async Task<IActionResult> GetById(int id)
         {
             var product = await GetProductDtoById(id);
-
             if (product == null)
                 return NotFound(new { message = "Product not found" });
-
             return Ok(product);
         }
 

@@ -47,142 +47,105 @@ const socialLinks = [
 </script>
 
 <template>
-    <footer class="relative bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 text-gray-300 overflow-hidden">
-        <!-- Decorative Background Elements -->
-        <div class="absolute inset-0 opacity-10">
-            <div class="absolute top-0 left-1/4 w-96 h-96 bg-violet-600 rounded-full blur-3xl"></div>
-            <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-600 rounded-full blur-3xl"></div>
-        </div>
-        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- Main Footer Content -->
-            <div class="pt-16 pb-12">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8">
-                    
-                    <!-- Brand Section -->
-                    <div class="lg:col-span-4 space-y-6">
-                        <RouterLink to="/" class="inline-flex items-center gap-2 group">
-                            <span class="text-3xl font-bold text-white">
-                                Aliee<span class="bg-linear-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">Shop</span>
-                            </span>
-                        </RouterLink>
-                        <p class="text-gray-400 leading-relaxed text-sm">
-                            Discover unique products that elevate your lifestyle. Quality, style, and innovation in every purchase.
-                        </p>
-                        <!-- Contact Info -->
-                        <div class="space-y-3">
-                            <a href="tel:+1234567890" class="flex items-center gap-3 text-sm hover:text-violet-400 transition-colors group">
-                                <div class="w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center group-hover:bg-violet-600 transition-colors">
-                                    <Phone class="w-4 h-4" />
-                                </div>
-                                <span>+1 (234) 567-890</span>
-                            </a>
-                            
-                            <a href="mailto:support@alieeshop.com" class="flex items-center gap-3 text-sm hover:text-violet-400 transition-colors group">
-                                <div class="w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center group-hover:bg-violet-600 transition-colors">
-                                    <Mail class="w-4 h-4" />
-                                </div>
-                                <span>support@alieeshop.com</span>
-                            </a>
-                            
-                            <div class="flex items-center gap-3 text-sm">
-                                <div class="w-9 h-9 rounded-lg bg-slate-800 flex items-center justify-center">
-                                    <MapPin class="w-4 h-4" />
-                                </div>
-                                <span>123 Commerce St, Phnom Penh</span>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Quick Links Sections -->
-                    <div class="lg:col-span-2">
-                        <h3 class="text-white font-bold text-sm uppercase tracking-wider mb-6 flex items-center gap-2">
-                            <span class="w-8 h-0.5 bg-linear-to-r from-violet-600 to-purple-600"></span>
-                            Shop
-                        </h3>
-                        <ul class="space-y-3">
-                            <li v-for="link in footerLinks.shop" :key="link.name">
-                                <RouterLink :to="link.to"
-                                    class="text-sm hover:text-violet-400 hover:translate-x-1 transition-all duration-300 inline-block">
-                                    {{ link.name }}
-                                </RouterLink>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="lg:col-span-2">
-                        <h3 class="text-white font-bold text-sm uppercase tracking-wider mb-6 flex items-center gap-2">
-                            <span class="w-8 h-0.5 bg-linear-to-r from-violet-600 to-purple-600"></span>
-                            Help
-                        </h3>
-                        <ul class="space-y-3">
-                            <li v-for="link in footerLinks.help" :key="link.name">
-                                <RouterLink :to="link.to"
-                                    class="text-sm hover:text-violet-400 hover:translate-x-1 transition-all duration-300 inline-block">
-                                    {{ link.name }}
-                                </RouterLink>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="lg:col-span-2">
-                        <h3 class="text-white font-bold text-sm uppercase tracking-wider mb-6 flex items-center gap-2">
-                            <span class="w-8 h-0.5 bg-linear-to-r from-violet-600 to-purple-600"></span>
-                            Company
-                        </h3>
-                        <ul class="space-y-3">
-                            <li v-for="link in footerLinks.company" :key="link.name">
-                                <RouterLink :to="link.to"
-                                    class="text-sm hover:text-violet-400 hover:translate-x-1 transition-all duration-300 inline-block">
-                                    {{ link.name }}
-                                </RouterLink>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="lg:col-span-2">
-                        <h3 class="text-white font-bold text-sm uppercase tracking-wider mb-6 flex items-center justify-center gap-2">
-                            <span class="w-8 h-0.5 bg-linear-to-r from-violet-600 to-purple-600"></span>
-                            Social Media
-                        </h3>
-                        <!-- Social Media Links -->
-                        <div class="mt-12 flex justify-center gap-3">
-                            <a v-for="social in socialLinks" :key="social.label" :href="social.href" target="_blank"
-                                rel="noopener noreferrer" :aria-label="social.label"
-                                class="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center text-white transition-all duration-300 hover:scale-110 hover:text-white"
-                                :class="social.color">
-                                <component :is="social.icon" class="w-5 h-5" />
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Bottom Bar -->
-            <div class="py-8 border-t border-slate-700/50">
-                <div class="flex flex-col lg:flex-row items-center justify-between gap-6">
-                    
-                    <!-- Copyright -->
-                    <p class="text-sm text-gray-400 text-center lg:text-left">
-                        © {{ currentYear }} AlieeShop. All rights reserved.
+    <footer class="bg-white border-t border-gray-100 pt-24 pb-12 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-16 mb-24">
+                
+                <!-- Brand Section -->
+                <div class="lg:col-span-4 space-y-10">
+                    <RouterLink to="/" class="inline-block group">
+                        <span class="text-3xl tracking-tight text-gray-900">
+                            <span class="font-light">Aliee</span><span class="font-black italic">Shop</span>
+                        </span>
+                    </RouterLink>
+                    <p class="text-gray-500 text-lg font-light leading-relaxed max-w-sm">
+                        Curating a world of exceptional products for your modern lifestyle. Quality is our signature.
                     </p>
+                    <!-- Social Media Links -->
+                    <div class="flex gap-4">
+                        <a v-for="social in socialLinks" :key="social.label" :href="social.href" target="_blank"
+                            rel="noopener noreferrer" :aria-label="social.label"
+                            class="w-12 h-12 rounded-full border border-gray-100 flex items-center justify-center text-gray-400 transition-all duration-300 hover:border-gray-900 hover:text-gray-900 hover:scale-110">
+                            <component :is="social.icon" class="w-5 h-5" />
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Links Sections -->
+                <div class="lg:col-span-2">
+                    <h3 class="text-xs font-bold uppercase tracking-[0.2em] text-gray-900 mb-8">Shop</h3>
+                    <ul class="space-y-4">
+                        <li v-for="link in footerLinks.shop" :key="link.name">
+                            <RouterLink :to="link.to"
+                                class="text-gray-500 hover:text-gray-900 transition-colors text-sm font-medium inline-block">
+                                {{ link.name }}
+                            </RouterLink>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="lg:col-span-2">
+                    <h3 class="text-xs font-bold uppercase tracking-[0.2em] text-gray-900 mb-8">Help</h3>
+                    <ul class="space-y-4">
+                        <li v-for="link in footerLinks.help" :key="link.name">
+                            <RouterLink :to="link.to"
+                                class="text-gray-500 hover:text-gray-900 transition-colors text-sm font-medium inline-block">
+                                {{ link.name }}
+                            </RouterLink>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="lg:col-span-2">
+                    <h3 class="text-xs font-bold uppercase tracking-[0.2em] text-gray-900 mb-8">Company</h3>
+                    <ul class="space-y-4">
+                        <li v-for="link in footerLinks.company" :key="link.name">
+                            <RouterLink :to="link.to"
+                                class="text-gray-500 hover:text-gray-900 transition-colors text-sm font-medium inline-block">
+                                {{ link.name }}
+                            </RouterLink>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Contact Section -->
+                <div class="lg:col-span-2">
+                    <h3 class="text-xs font-bold uppercase tracking-[0.2em] text-gray-900 mb-8">Location</h3>
+                    <div class="space-y-6">
+                        <div class="flex gap-3">
+                            <MapPin class="w-5 h-5 text-gray-400 shrink-0" />
+                            <p class="text-sm text-gray-500 leading-relaxed font-medium">
+                                123 Commerce St,<br />
+                                Phnom Penh, KH
+                            </p>
+                        </div>
+                        <div class="flex gap-3">
+                            <Phone class="w-5 h-5 text-gray-400 shrink-0" />
+                            <a href="tel:+1234567890" class="text-sm text-gray-500 hover:text-gray-900 transition-colors font-medium">
+                                +1 (234) 567-890
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Bar -->
+            <div class="pt-12 border-t border-gray-100">
+                <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                    <p class="text-xs text-gray-400 font-bold uppercase tracking-widest">
+                        © {{ currentYear }} AlieeShop. Curated with passion.
+                    </p>
+                    <div class="flex gap-8">
+                        <a href="#" class="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-gray-900 transition-colors">Privacy Policy</a>
+                        <a href="#" class="text-[10px] font-bold uppercase tracking-widest text-gray-400 hover:text-gray-900 transition-colors">Terms of Service</a>
+                    </div>
                 </div>
             </div>
         </div>
-        <!-- Animated linear Line -->
-        <div class="absolute bottom-0 left-0 right-0 h-1 bg-linear-to-r from-violet-600 via-purple-600 to-violet-600 animate-gradient"></div>
     </footer>
 </template>
 
 <style scoped>
-@keyframes gradient {
-    0%, 100% {
-        background-position: 0% 50%;
-    }
-    50% {
-        background-position: 100% 50%;
-    }
-}
-
-.animate-gradient {
-    background-size: 200% 200%;
-    animation: gradient 3s ease infinite;
-}
-
 /* Smooth scroll behavior */
 html {
     scroll-behavior: smooth;

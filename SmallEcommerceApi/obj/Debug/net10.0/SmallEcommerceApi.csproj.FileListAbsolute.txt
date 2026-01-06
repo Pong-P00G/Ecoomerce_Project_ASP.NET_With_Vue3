@@ -413,6 +413,7 @@ C:\Users\pong7\OneDrive\Documents\Assignment ASP.NET\SmallEcommerceApi\obj\Debug
 C:\Users\pong7\OneDrive\Documents\Assignment ASP.NET\SmallEcommerceApi\obj\Debug\net10.0\SmallEcommerceApi.csproj.CoreCompileInputs.cache
 C:\Users\pong7\OneDrive\Documents\Assignment ASP.NET\SmallEcommerceApi\obj\Debug\net10.0\SmallEcommerceApi.MvcApplicationPartsAssemblyInfo.cs
 C:\Users\pong7\OneDrive\Documents\Assignment ASP.NET\SmallEcommerceApi\obj\Debug\net10.0\SmallEcommerceApi.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\pong7\OneDrive\Documents\Assignment ASP.NET\SmallEcommerceApi\obj\Debug\net10.0\SmallEcommerceApi.sourcelink.json
 C:\Users\pong7\OneDrive\Documents\Assignment ASP.NET\SmallEcommerceApi\obj\Debug\net10.0\rjimswa.dswa.cache.json
 C:\Users\pong7\OneDrive\Documents\Assignment ASP.NET\SmallEcommerceApi\obj\Debug\net10.0\rjsmrazor.dswa.cache.json
 C:\Users\pong7\OneDrive\Documents\Assignment ASP.NET\SmallEcommerceApi\obj\Debug\net10.0\rjsmcshtml.dswa.cache.json

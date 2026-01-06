@@ -37,12 +37,12 @@ namespace SmallEcommerceApi
             // Cors
             builder.Services.AddCors(options =>
             {
-                options.AddDefaultPolicy(policy =>
+                options.AddPolicy("AllowVueApp", policy =>
                 {
-                    policy.WithOrigins("https://localhost:7074", "http://localhost:3000", "http://localhost:5173")
-                          .AllowAnyHeader()
-                          .AllowAnyMethod()
-                          .AllowCredentials();
+                    policy.WithOrigins("https://localhost:3000, http://localhost:3000")
+                      .AllowAnyHeader()
+                      .AllowAnyMethod()
+                      .AllowCredentials();
                 });
             });
 
@@ -72,7 +72,7 @@ namespace SmallEcommerceApi
             }
 
             // USE CORS MIDDLEWARE (this stays after builder.Build())
-            app.UseCors();
+            app.UseCors("AllowVueApp");
             //app.UseRouting();
             app.UseHttpsRedirection();
             app.UseAuthorization();

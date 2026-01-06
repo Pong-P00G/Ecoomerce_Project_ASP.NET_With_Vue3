@@ -15,7 +15,7 @@ import {
     CheckCircle,
     Activity
 } from 'lucide-vue-next'
-import authAPI from '../../api/authApi.js'
+import { authAPI } from '../../api/authApi.js'
 
 // State
 const users = ref([])
@@ -261,549 +261,366 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="min-h-screen bg-gray-50">
-        <!-- Error Banner -->
-        <div v-if="error" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
-            <div class="bg-red-50 border border-red-200 rounded-2xl p-4 flex items-center gap-3">
-                <AlertCircle class="w-5 h-5 text-red-600 shrink-0" />
-                <div class="flex-1">
-                    <p class="text-sm font-semibold text-red-900">Error loading users</p>
-                    <p class="text-xs text-red-700 mt-0.5">{{ error }}</p>
-                </div>
-                <button @click="fetchUsers()" class="text-sm font-medium text-red-700 hover:text-red-900 underline">
-                    Retry
-                </button>
-            </div>
+    <div class="min-h-screen bg-slate-50/50">
+    <!-- Error Banner -->
+    <Transition name="slide-down">
+      <div v-if="error" class="fixed top-8 left-1/2 -translate-x-1/2 z-[100] w-full max-w-2xl px-6">
+        <div class="bg-white border border-rose-100 rounded-[32px] p-6 shadow-2xl shadow-rose-200/50 flex items-center gap-6">
+          <div class="w-14 h-14 bg-rose-50 rounded-2xl flex items-center justify-center shrink-0">
+            <AlertCircle class="w-7 h-7 text-rose-500" />
+          </div>
+          <div class="flex-1">
+            <p class="text-sm font-black text-slate-900 uppercase tracking-widest">System Error</p>
+            <p class="text-xs text-slate-500 mt-1 font-bold leading-relaxed">{{ error }}</p>
+          </div>
+          <button @click="fetchUsers" class="p-3 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-all">
+            <RefreshCw class="w-5 h-5" />
+          </button>
         </div>
-        <!-- Success Message -->
-        <Transition name="slide-fade">
-            <div v-if="success"
-                class="fixed top-4 right-4 bg-emerald-50 border border-emerald-200 text-emerald-800 px-6 py-4 rounded-2xl shadow-xl z-50 max-w-md flex items-center gap-3">
-                <CheckCircle class="w-5 h-5 shrink-0" />
-                <span class="flex-1 font-medium">{{ success }}</span>
-                <button @click="success = null" class="text-emerald-600 hover:text-emerald-800 transition-colors">
-                    <X class="w-4 h-4" />
-                </button>
+      </div>
+    </Transition>
+
+    <!-- Success Message -->
+    <Transition name="slide-down">
+      <div v-if="success" class="fixed top-8 right-8 z-[100] max-w-md">
+        <div class="bg-slate-900 border border-slate-800 text-white px-8 py-5 rounded-[24px] shadow-2xl flex items-center gap-4">
+          <div class="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shrink-0">
+            <CheckCircle class="w-6 h-6 text-white" />
+          </div>
+          <span class="flex-1 font-bold text-sm tracking-tight">{{ success }}</span>
+          <button @click="success = null" class="text-slate-400 hover:text-white transition-colors p-1">
+            <X class="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+    </Transition>
+
+    <!-- Header -->
+    <header class="bg-white/80 backdrop-blur-md border-b border-slate-100 sticky top-0 z-40">
+      <div class="max-w-[1600px] mx-auto px-6 sm:px-8 lg:px-12 py-6">
+        <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-8">
+          <div class="flex items-center gap-6">
+            <div class="w-14 h-14 bg-gradient-to-br from-slate-800 to-slate-900 rounded-[20px] flex items-center justify-center shadow-lg shadow-slate-200 rotate-3 group hover:rotate-0 transition-transform duration-300">
+              <Users class="w-7 h-7 text-white" />
             </div>
-        </Transition>
-        <!-- Header -->
-        <header class="bg-white shadow-sm border-b border-gray-100">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-                    <div>
-                        <h1 class="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                            <Users class="w-8 h-8 text-blue-600" />
-                            Manage Users
-                        </h1>
-                        <p class="text-sm text-gray-600 mt-2">Manage user accounts and permissions</p>
+            <div>
+              <h1 class="text-2xl font-black text-slate-900 tracking-tight">User Management</h1>
+              <p class="text-[10px] text-slate-400 mt-1 font-black uppercase tracking-[0.2em]">Administration Panel</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <button @click="fetchUsers"
+              class="flex items-center gap-2.5 px-5 py-3 text-xs font-black text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 hover:border-slate-300 transition-all active:scale-95 disabled:opacity-50"
+              :disabled="loading">
+              <RefreshCw :class="['w-4 h-4', loading && 'animate-spin']" />
+              <span>{{ loading ? 'Syncing...' : 'Refresh' }}</span>
+            </button>
+            <button @click="openAddModal"
+              class="flex items-center gap-2.5 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 active:scale-95 font-black text-xs uppercase tracking-widest">
+              <Plus class="w-4 h-4" />
+              Add New User
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-[1600px] mx-auto px-6 sm:px-8 lg:px-12 py-12">
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div v-for="(stat, idx) in [
+          { label: 'Total Users', value: stats.total, icon: Users, color: 'blue' },
+          { label: 'Active Users', value: stats.active, icon: CheckCircle, color: 'emerald' },
+          { label: 'Inactive', value: stats.inactive, icon: AlertCircle, color: 'rose' },
+          { label: 'Administrators', value: stats.admins, icon: Activity, color: 'indigo' }
+        ]" :key="idx" 
+          class="bg-white rounded-3xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition-all duration-300 group">
+          <div class="flex items-center gap-5">
+            <div :class="`w-12 h-12 rounded-2xl flex items-center justify-center transition-colors duration-300 bg-${stat.color}-50 group-hover:bg-${stat.color}-100` ">
+              <component :is="stat.icon" :class="`w-6 h-6 text-${stat.color}-600`" />
+            </div>
+            <div>
+              <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">{{ stat.label }}</p>
+              <p class="text-2xl font-black text-slate-900 tracking-tight">{{ stat.value }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions Bar -->
+      <div class="bg-white rounded-3xl shadow-sm mb-12 p-6 border border-slate-100">
+        <div class="flex flex-col lg:flex-row gap-4">
+          <div class="flex-1">
+            <div class="relative group">
+              <Search class="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 w-5 h-5 group-focus-within:text-blue-600 transition-colors" />
+              <input v-model="searchTerm" type="text"
+                placeholder="Search users by name, email, or department..."
+                class="w-full pl-12 pr-5 py-3.5 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:border-blue-200 focus:ring-4 focus:ring-blue-50/50 transition-all font-medium text-slate-600 text-sm" />
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-3">
+            <div class="relative">
+              <select v-model="selectedRole"
+                class="appearance-none pl-5 pr-10 py-3.5 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:border-blue-200 transition-all font-bold text-[11px] uppercase tracking-widest text-slate-700 outline-none cursor-pointer">
+                <option value="all">All Roles</option>
+                <option v-for="role in roles" :key="role" :value="role">{{ role }}</option>
+              </select>
+              <Filter class="absolute right-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
+            </div>
+
+            <div class="relative">
+              <select v-model="selectedStatus"
+                class="appearance-none pl-5 pr-10 py-3.5 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:border-blue-200 transition-all font-bold text-[11px] uppercase tracking-widest text-slate-700 outline-none cursor-pointer">
+                <option value="all">Any Status</option>
+                <option value="active">Active</option>
+                <option value="inactive">Inactive</option>
+              </select>
+              <Filter class="absolute right-4 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
+            </div>
+
+            <button @click="exportToCSV"
+              class="flex items-center gap-2.5 px-6 py-3.5 bg-slate-900 text-white rounded-xl hover:bg-slate-800 transition-all font-bold text-[11px] uppercase tracking-widest active:scale-95 shadow-lg shadow-slate-200">
+              <Download class="w-4 h-4" />
+              Export CSV
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Users Table -->
+      <div class="bg-white rounded-3xl shadow-sm overflow-hidden border border-slate-100">
+        <div v-if="loading && users.length === 0" class="p-16 space-y-6">
+          <div v-for="i in 5" :key="i" class="flex items-center gap-6 animate-pulse">
+            <div class="w-12 h-12 bg-slate-50 rounded-xl"></div>
+            <div class="flex-1 space-y-3">
+              <div class="h-4 bg-slate-50 rounded-lg w-1/4"></div>
+              <div class="h-3 bg-slate-50 rounded-lg w-1/6"></div>
+            </div>
+          </div>
+        </div>
+
+        <div v-else-if="filteredUsers.length === 0" class="text-center py-24">
+          <div class="w-20 h-20 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
+            <Users class="w-10 h-10 text-slate-200" />
+          </div>
+          <h3 class="text-xl font-black text-slate-900 tracking-tight">No Results Found</h3>
+          <p class="text-slate-400 mt-2 text-sm font-medium max-w-xs mx-auto">We couldn't find any users matching your current filters.</p>
+        </div>
+
+        <div v-else class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="bg-slate-50/50 border-b border-slate-100">
+                <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Member</th>
+                <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Department</th>
+                <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Role</th>
+                <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Status</th>
+                <th class="px-8 py-5 text-right text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-50">
+              <tr v-for="user in filteredUsers" :key="user.id"
+                class="group hover:bg-slate-50/80 transition-all duration-200">
+                <td class="px-8 py-5">
+                  <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center shrink-0 border border-slate-200/50 group-hover:scale-110 transition-transform duration-300">
+                      <span class="text-sm font-black text-slate-500">{{ user.name.charAt(0) }}</span>
                     </div>
-                    <button @click="fetchUsers"
-                        class="self-start sm:self-auto flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors"
-                        :disabled="loading">
-                        <Loader2 v-if="loading" class="w-4 h-4 animate-spin" />
-                        <span>{{ loading ? 'Refreshing...' : 'Refresh' }}</span>
+                    <div class="min-w-0">
+                      <p class="text-sm font-bold text-slate-900 truncate tracking-tight">{{ user.name }}</p>
+                      <p class="text-[11px] font-medium text-slate-400 truncate">{{ user.email }}</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-8 py-5">
+                  <p class="text-xs font-bold text-slate-600 uppercase tracking-wider">{{ user.department || 'General' }}</p>
+                </td>
+                <td class="px-8 py-5">
+                  <span class="inline-flex items-center px-2.5 py-1 bg-blue-50 text-blue-700 rounded-lg text-[10px] font-black uppercase tracking-widest border border-blue-100">
+                    {{ user.role }}
+                  </span>
+                </td>
+                <td class="px-8 py-5">
+                  <span :class="`inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${user.status === 'active' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-rose-50 text-rose-700 border-rose-100'}`">
+                    {{ user.status }}
+                  </span>
+                </td>
+                <td class="px-8 py-5">
+                  <div class="flex justify-end gap-2">
+                    <button @click="openViewModal(user)"
+                      class="p-2 text-slate-400 hover:text-slate-900 hover:bg-white hover:shadow-sm rounded-lg transition-all border border-transparent hover:border-slate-100">
+                      <Eye class="w-4 h-4" />
                     </button>
-                </div>
-            </div>
-        </header>
-
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
-            <!-- Loading Skeleton -->
-            <div v-if="loading && users.length === 0">
-                <!-- Stats Cards Skeleton -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                    <div v-for="i in 4" :key="i" class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm animate-pulse">
-                        <div class="flex items-center justify-between">
-                            <div class="flex-1">
-                                <div class="h-3 bg-gray-200 rounded w-24 mb-4"></div>
-                                <div class="h-8 bg-gray-200 rounded w-20"></div>
-                            </div>
-                            <div class="w-12 h-12 rounded-2xl bg-gray-200"></div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Actions Bar Skeleton -->
-                <div class="bg-white rounded-[32px] border border-gray-100 shadow-sm mb-8 p-6 animate-pulse">
-                    <div class="flex flex-col lg:flex-row gap-4">
-                        <div class="flex-1 h-12 bg-gray-200 rounded-2xl"></div>
-                        <div class="flex gap-3 w-full lg:w-auto">
-                            <div class="h-12 bg-gray-200 rounded-2xl w-32"></div>
-                            <div class="h-12 bg-gray-200 rounded-2xl w-32"></div>
-                            <div class="h-12 bg-gray-200 rounded-2xl w-32"></div>
-                            <div class="h-12 bg-gray-200 rounded-2xl w-40"></div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Table Skeleton -->
-                <div class="bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-hidden animate-pulse">
-                    <div class="p-8 space-y-4">
-                        <div v-for="i in 5" :key="i" class="flex items-center gap-4 py-4 border-b border-gray-100">
-                            <div class="w-12 h-12 rounded-2xl bg-gray-200"></div>
-                            <div class="flex-1 space-y-2">
-                                <div class="h-4 bg-gray-200 rounded w-48"></div>
-                                <div class="h-3 bg-gray-200 rounded w-32"></div>
-                            </div>
-                            <div class="h-4 bg-gray-200 rounded w-32"></div>
-                            <div class="h-4 bg-gray-200 rounded w-24"></div>
-                            <div class="h-4 bg-gray-200 rounded w-20"></div>
-                            <div class="h-4 bg-gray-200 rounded w-16"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
-            <!-- Stats Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-                <div
-                    class="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-shadow">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Total Users</p>
-                            <p class="text-3xl font-bold text-gray-900 mt-2">{{ stats.total }}</p>
-                        </div>
-                        <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
-                            <Users class="w-6 h-6" />
-                        </div>
-                    </div>
-                </div>
-
-                <div
-                    class="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-shadow">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Active Users</p>
-                            <p class="text-3xl font-bold text-emerald-600 mt-2">{{ stats.active }}</p>
-                        </div>
-                        <div
-                            class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600">
-                            <CheckCircle class="w-6 h-6" />
-                        </div>
-                    </div>
-                </div>
-
-                <div
-                    class="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-shadow">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Inactive Users</p>
-                            <p class="text-3xl font-bold text-rose-600 mt-2">{{ stats.inactive }}</p>
-                        </div>
-                        <div class="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600">
-                            <AlertCircle class="w-6 h-6" />
-                        </div>
-                    </div>
-                </div>
-
-                <div
-                    class="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 hover:shadow-md transition-shadow">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Admins</p>
-                            <p class="text-3xl font-bold text-purple-600 mt-2">{{ stats.admins }}</p>
-                        </div>
-                        <div
-                            class="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600">
-                            <Activity class="w-6 h-6" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Actions Bar --> 
-            <div class="bg-white text-gray-900 rounded-[32px] border border-gray-100 shadow-sm mb-8 p-6">
-                <div class="flex flex-col lg:flex-row gap-4 items-center">
-                    <!-- Search -->
-                    <div class="flex-1 w-full">
-                        <div class="relative group">
-                            <Search
-                                class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 group-focus-within:text-blue-600 transition-colors" />
-                            <input v-model="searchTerm" type="text"
-                                placeholder="Search users by name, email, or department..."
-                                class="w-full pl-12 pr-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-600/20 transition-all" />
-                        </div>
-                    </div>
-
-                    <!-- Filters & Actions -->
-                    <div class="flex flex-wrap gap-3 w-full lg:w-auto">
-                        <select v-model="selectedRole"
-                            class="grow lg:grow-0 px-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-600/20 text-sm font-medium">
-                            <option value="all">All Roles</option>
-                            <option v-for="role in roles" :key="role" :value="role">{{ role }}</option>
-                        </select>
-
-                        <select v-model="selectedStatus"
-                            class="grow lg:grow-0 px-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-blue-600/20 text-sm font-medium">
-                            <option value="all">All Status</option>
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                        </select>
-
-                        <div class="flex gap-2 w-full lg:w-auto">
-                            <button @click="exportToCSV"
-                                class="flex-1 lg:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-gray-50 text-gray-700 rounded-2xl hover:bg-gray-100 transition-colors font-bold text-sm">
-                                <Download class="w-4 h-4" />
-                                Export
-                            </button>
-
-                            <button @click="openAddModal"
-                                class="flex-1 lg:flex-none flex items-center justify-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-2xl hover:bg-gray-800 transition-colors font-bold text-sm shadow-lg shadow-gray-200">
-                                <Plus class="w-4 h-4" />
-                                Add User
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Users Table -->
-            <div class="bg-white rounded-[32px] border border-gray-100 shadow-sm overflow-hidden">
-                <div v-if="filteredUsers.length === 0 && !loading" class="text-center py-20">
-                    <div
-                        class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-300">
-                        <Users class="w-10 h-10" />
-                    </div>
-                    <p class="text-gray-500 font-medium text-lg mb-2">No users found matching your search</p>
-                    <p class="text-sm text-gray-400 mb-4">Try adjusting your filters or search terms</p>
-                    <button @click="searchTerm = ''; selectedRole = 'all'; selectedStatus = 'all'"
-                        class="px-6 py-2 text-sm font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-xl transition-colors">
-                        Clear all filters
+                    <button @click="openEditModal(user)"
+                      class="p-2 text-slate-400 hover:text-blue-600 hover:bg-white hover:shadow-sm rounded-lg transition-all border border-transparent hover:border-slate-100">
+                      <Edit2 class="w-4 h-4" />
                     </button>
-                </div>
-
-                <div v-if="loading && users.length > 0" class="p-8 text-center">
-                    <Loader2 class="w-6 h-6 animate-spin text-blue-600 mx-auto mb-2" />
-                    <p class="text-sm text-gray-500">Refreshing users...</p>
-                </div>
-
-                <div v-else class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-gray-50/50 border-b border-gray-100">
-                                <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">User
-                                    Details</th>
-                                <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                                    Email</th>
-                                <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Role
-                                </th>
-                                <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                                    Department</th>
-                                <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                                    Status</th>
-                                <th
-                                    class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-right">
-                                    Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-50">
-                            <tr v-for="user in filteredUsers" :key="user.id"
-                                class="hover:bg-gray-50/50 transition-colors group">
-                                <td class="px-8 py-5">
-                                    <div class="flex items-center gap-4">
-                                        <div
-                                            class="w-12 h-12 rounded-2xl bg-gray-100 flex items-center justify-center shrink-0 group-hover:bg-white transition-colors">
-                                            <Users class="w-6 h-6 text-gray-400" />
-                                        </div>
-                                        <div>
-                                            <p
-                                                class="font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
-                                                {{ user.name }}</p>
-                                            <p
-                                                class="text-xs text-gray-500 mt-0.5 font-medium tracking-tight uppercase">
-                                                {{ user.phone || 'No phone' }}</p>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="px-8 py-5 text-sm text-gray-600 font-medium">{{ user.email }}</td>
-                                <td class="px-8 py-5">
-                                    <span
-                                        class="px-3 py-1 bg-blue-50 text-blue-700 rounded-lg text-[10px] font-bold uppercase tracking-wider">
-                                        {{ user.role }}
-                                    </span>
-                                </td>
-                                <td class="px-8 py-5 text-sm text-gray-600 font-medium">{{ user.department }}</td>
-                                <td class="px-8 py-5">
-                                    <span :class="[
-                                        'px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider',
-                                        user.status === 'active' ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
-                                    ]">
-                                        {{ user.status }}
-                                    </span>
-                                </td>
-                                <td class="px-8 py-5">
-                                    <div
-                                        class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button @click="openViewModal(user)"
-                                            class="p-2.5 text-gray-400 hover:text-gray-900 hover:bg-white rounded-xl shadow-sm transition-all border border-transparent hover:border-gray-100">
-                                            <Eye class="w-4 h-4" />
-                                        </button>
-                                        <button @click="openEditModal(user)"
-                                            class="p-2.5 text-blue-400 hover:text-blue-600 hover:bg-white rounded-xl shadow-sm transition-all border border-transparent hover:border-gray-100">
-                                            <Edit2 class="w-4 h-4" />
-                                        </button>
-                                        <button @click="handleDeleteUser(user.id)"
-                                            class="p-2.5 text-rose-400 hover:text-rose-600 hover:bg-white rounded-xl shadow-sm transition-all border border-transparent hover:border-gray-100">
-                                            <Trash2 class="w-4 h-4" />
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+                    <button @click="handleDeleteUser(user.id)"
+                      class="p-2 text-slate-400 hover:text-rose-600 hover:bg-white hover:shadow-sm rounded-lg transition-all border border-transparent hover:border-slate-100">
+                      <Trash2 class="w-4 h-4" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
+      </div>
+    </main>
 
-        <!-- Add User Modal -->
-        <Teleport to="body">
-            <Transition name="modal">
-                <div v-if="showAddModal"
-                    class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                    <div
-                        class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
-                        <div class="p-6 border-b border-gray-100 shrink-0">
-                            <div class="flex justify-between items-center">
-                                <h3 class="text-2xl font-bold text-gray-900">Add New User</h3>
-                                <button @click="closeModals" class="p-2 hover:bg-gray-100 rounded-xl transition-colors">
-                                    <X class="w-5 h-5 text-gray-500" />
-                                </button>
-                            </div>
-                        </div>
-                        <div class="p-6 overflow-y-auto flex-1">
-
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
-                                    <input v-model="formData.name" type="text"
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                        placeholder="Enter full name" required />
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
-                                    <input v-model="formData.email" type="email"
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                        placeholder="Enter email address" required />
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Role *</label>
-                                    <select v-model="formData.role"
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                        required>
-                                        <option value="">Select role</option>
-                                        <option v-for="role in roles" :key="role" :value="role">{{ role }}</option>
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Status *</label>
-                                    <select v-model="formData.status"
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                        required>
-                                        <option value="">Select status</option>
-                                        <option value="active">Active</option>
-                                        <option value="inactive">Inactive</option>
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                                    <input v-model="formData.phone" type="tel"
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                        placeholder="Enter phone number" />
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Department</label>
-                                    <input v-model="formData.department" type="text"
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                        placeholder="Enter department" />
-                                </div>
-                            </div>
-
-                            <div class="flex gap-3 mt-6 pt-6 border-t border-gray-100">
-                                <button @click="closeModals"
-                                    class="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-semibold">
-                                    Cancel
-                                </button>
-                                <button @click="handleAddUser"
-                                    :disabled="loading || !formData.name || !formData.email || !formData.role || !formData.status"
-                                    class="flex-1 bg-gray-900 text-white py-3 rounded-xl hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold flex items-center justify-center gap-2">
-                                    <Loader2 v-if="loading" class="w-4 h-4 animate-spin" />
-                                    {{ loading ? 'Adding...' : 'Add User' }}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+    <!-- Modals -->
+    <Teleport to="body">
+      <!-- Add/Edit Modal -->
+      <Transition name="modal">
+        <div v-if="showAddModal || showEditModal"
+          class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4 sm:p-6"
+          @click.self="closeModals">
+          <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col transform transition-all">
+            <div class="px-8 py-6 border-b border-slate-50 flex justify-between items-center shrink-0">
+              <div class="flex items-center gap-4">
+                <div class="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center">
+                  <Plus v-if="showAddModal" class="w-5 h-5 text-white" />
+                  <Edit2 v-else class="w-5 h-5 text-white" />
                 </div>
-            </Transition>
-        </Teleport>
-
-        <!-- View User Modal -->
-        <Teleport to="body">
-            <Transition name="modal">
-                <div v-if="showViewModal && currentUser"
-                    class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden">
-                        <div class="p-6 border-b border-gray-100">
-                            <div class="flex justify-between items-center">
-                                <h3 class="text-2xl font-bold text-gray-900">User Details</h3>
-                                <button @click="closeModals" class="p-2 hover:bg-gray-100 rounded-xl transition-colors">
-                                    <X class="w-5 h-5 text-gray-500" />
-                                </button>
-                            </div>
-                        </div>
-                        <div class="p-6">
-
-                            <div class="space-y-4">
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-500">Full Name</p>
-                                        <p class="text-base text-gray-900 mt-1">{{ currentUser.name }}</p>
-                                    </div>
-
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-500">Email</p>
-                                        <p class="text-base text-gray-900 mt-1">{{ currentUser.email }}</p>
-                                    </div>
-
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-500">Role</p>
-                                        <p class="text-base text-gray-900 mt-1">{{ currentUser.role }}</p>
-                                    </div>
-
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-500">Status</p>
-                                        <span :class="[
-                                            'inline-block px-2 py-1 text-xs font-medium rounded-full mt-1',
-                                            currentUser.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                                        ]">
-                                            {{ currentUser.status }}
-                                        </span>
-                                    </div>
-
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-500">Phone</p>
-                                        <p class="text-base text-gray-900 mt-1">{{ currentUser.phone || 'Not provided'
-                                            }}</p>
-                                    </div>
-
-                                    <div>
-                                        <p class="text-sm font-medium text-gray-500">Department</p>
-                                        <p class="text-base text-gray-900 mt-1">{{ currentUser.department ||
-                                            'Notassigned' }}
-                                        </p>
-                                    </div>
-
-                                    <div class="col-span-2">
-                                        <p class="text-sm font-medium text-gray-500">Created At</p>
-                                        <p class="text-base text-gray-900 mt-1">{{ currentUser.createdAt }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="p-6 border-t border-gray-100 flex gap-3">
-                            <button @click="closeModals"
-                                class="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-semibold">
-                                Close
-                            </button>
-                            <button @click="openEditModal(currentUser)"
-                                class="flex-1 bg-gray-900 text-white py-3 rounded-xl hover:bg-gray-800 transition-colors font-semibold">
-                                Edit User
-                            </button>
-                        </div>
-                    </div>
+                <div>
+                  <h3 class="text-xl font-black text-slate-900 tracking-tight">
+                    {{ showAddModal ? 'New User' : 'Edit User' }}
+                  </h3>
+                  <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Account Configuration</p>
                 </div>
-            </Transition>
-        </Teleport>
+              </div>
+              <button @click="closeModals" class="p-2 hover:bg-slate-50 rounded-lg transition-all">
+                <X class="w-5 h-5 text-slate-400" />
+              </button>
+            </div>
 
-        <!-- Edit User Modal -->
-        <Teleport to="body">
-            <Transition name="modal">
-                <div v-if="showEditModal"
-                    class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-                    <div
-                        class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
-                        <div class="p-6 border-b border-gray-100 shrink-0">
-                            <div class="flex justify-between items-center">
-                                <h3 class="text-2xl font-bold text-gray-900">Edit User</h3>
-                                <button @click="closeModals" class="p-2 hover:bg-gray-100 rounded-xl transition-colors">
-                                    <X class="w-5 h-5 text-gray-500" />
-                                </button>
-                            </div>
-                        </div>
-                        <div class="p-6 overflow-y-auto flex-1">
-
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
-                                    <input v-model="formData.name" type="text"
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                        placeholder="Enter full name" required />
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Email *</label>
-                                    <input v-model="formData.email" type="email"
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                        placeholder="Enter email address" required />
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Role *</label>
-                                    <select v-model="formData.role"
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                        required>
-                                        <option value="">Select role</option>
-                                        <option v-for="role in roles" :key="role" :value="role">{{ role }}</option>
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Status *</label>
-                                    <select v-model="formData.status"
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                        required>
-                                        <option value="">Select status</option>
-                                        <option value="active">Active</option>
-                                        <option value="inactive">Inactive</option>
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                                    <input v-model="formData.phone" type="tel"
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                        placeholder="Enter phone number" />
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700 mb-1">Department</label>
-                                    <input v-model="formData.department" type="text"
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                        placeholder="Enter department" />
-                                </div>
-                            </div>
-
-                            <div class="flex gap-3 mt-6 pt-6 border-t border-gray-100">
-                                <button @click="closeModals"
-                                    class="px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors font-semibold">
-                                    Cancel
-                                </button>
-                                <button @click="handleUpdateUser"
-                                    :disabled="loading || !formData.name || !formData.email || !formData.role || !formData.status"
-                                    class="flex-1 bg-gray-900 text-white py-3 rounded-xl hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold flex items-center justify-center gap-2">
-                                    <Loader2 v-if="loading" class="w-4 h-4 animate-spin" />
-                                    {{ loading ? 'Updating...' : 'Update User' }}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+            <div class="p-8 overflow-y-auto grow custom-scrollbar">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-5">
+                  <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Full Name</label>
+                    <input v-model="formData.name" type="text" required
+                      class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:border-blue-200 transition-all font-bold text-slate-700 outline-none text-sm"
+                      placeholder="e.g. John Doe" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Email Address</label>
+                    <input v-model="formData.email" type="email" required
+                      class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:border-blue-200 transition-all font-bold text-slate-700 outline-none text-sm"
+                      placeholder="e.g. john@example.com" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Phone Number</label>
+                    <input v-model="formData.phone" type="tel"
+                      class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:border-blue-200 transition-all font-bold text-slate-700 outline-none text-sm"
+                      placeholder="e.g. +1 234 567 890" />
+                  </div>
                 </div>
-            </Transition>
-        </Teleport>
-    </div>
+
+                <div class="space-y-5">
+                  <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Department</label>
+                    <input v-model="formData.department" type="text"
+                      class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:border-blue-200 transition-all font-bold text-slate-700 outline-none text-sm"
+                      placeholder="e.g. Marketing" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">System Role</label>
+                    <select v-model="formData.role" required
+                      class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:border-blue-200 transition-all font-black text-xs uppercase tracking-widest text-slate-700 outline-none cursor-pointer">
+                      <option value="">Select Role</option>
+                      <option v-for="role in roles" :key="role" :value="role">{{ role }}</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ml-1">Account Status</label>
+                    <select v-model="formData.status" required
+                      class="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl focus:bg-white focus:border-blue-200 transition-all font-black text-xs uppercase tracking-widest text-slate-700 outline-none cursor-pointer">
+                      <option value="">Select Status</option>
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-8 border-t border-slate-50 bg-slate-50/50 flex gap-3 shrink-0">
+              <button @click="closeModals"
+                class="px-6 py-3 bg-white border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-100 transition-all font-bold text-xs uppercase tracking-widest">
+                Cancel
+              </button>
+              <button @click="showAddModal ? handleAddUser() : handleUpdateUser()"
+                :disabled="loading || !formData.name || !formData.email || !formData.role || !formData.status"
+                class="flex-1 bg-blue-600 text-white py-3 rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-blue-100">
+                <Loader2 v-if="loading" class="w-4 h-4 animate-spin" />
+                <span>{{ loading ? 'Processing...' : (showAddModal ? 'Create User' : 'Update User') }}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </Transition>
+
+      <!-- View User Modal -->
+      <Transition name="modal">
+        <div v-if="showViewModal && currentUser"
+          class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4 sm:p-6"
+          @click.self="closeModals">
+          <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden flex flex-col transform transition-all">
+            <div class="p-8 text-center bg-slate-50 border-b border-slate-100 relative shrink-0">
+              <button @click="closeModals" class="absolute right-4 top-4 p-2 hover:bg-white rounded-lg transition-all">
+                <X class="w-5 h-5 text-slate-400" />
+              </button>
+              <div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-sm border border-slate-100">
+                <Users class="w-10 h-10 text-slate-900" />
+              </div>
+              <h3 class="text-2xl font-black text-slate-900 tracking-tight leading-none mb-2">{{ currentUser.name }}</h3>
+              <p class="text-[10px] font-black text-blue-600 uppercase tracking-[0.2em] bg-blue-50 inline-block px-3 py-1 rounded-full">{{ currentUser.role }}</p>
+            </div>
+
+            <div class="p-8 space-y-6">
+              <div class="space-y-4">
+                <div class="flex items-center justify-between py-2 border-b border-slate-50">
+                  <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Email</span>
+                  <span class="text-sm font-bold text-slate-700">{{ currentUser.email }}</span>
+                </div>
+                <div class="flex items-center justify-between py-2 border-b border-slate-50">
+                  <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</span>
+                  <span :class="`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${currentUser.status === 'active' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-rose-50 text-rose-700 border-rose-100'}`">
+                    {{ currentUser.status }}
+                  </span>
+                </div>
+                <div class="flex items-center justify-between py-2 border-b border-slate-50">
+                  <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Department</span>
+                  <span class="text-sm font-bold text-slate-700">{{ currentUser.department || 'General' }}</span>
+                </div>
+                <div class="flex items-center justify-between py-2 border-b border-slate-50">
+                  <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Phone</span>
+                  <span class="text-sm font-bold text-slate-700">{{ currentUser.phone || 'N/A' }}</span>
+                </div>
+                <div class="flex items-center justify-between py-2 border-b border-slate-50">
+                  <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Joined</span>
+                  <span class="text-sm font-bold text-slate-700">{{ currentUser.createdAt }}</span>
+                </div>
+              </div>
+
+              <div class="flex gap-3 pt-2">
+                <button @click="closeModals"
+                  class="flex-1 px-6 py-3 bg-white border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-100 transition-all font-bold text-xs uppercase tracking-widest">
+                  Close
+                </button>
+                <button @click="openEditModal(currentUser)"
+                  class="flex-1 bg-slate-900 text-white py-3 rounded-xl hover:bg-slate-800 transition-all font-black text-xs uppercase tracking-widest shadow-lg shadow-slate-200">
+                  Edit Profile
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+  </div>
 </template>
 
 <style scoped>

@@ -55,7 +55,7 @@ const startAutoPlay = () => {
     stopAutoPlay();
     autoPlayInterval.value = setInterval(() => {
         nextSlide();
-    }, 5000);
+    }, 3000); // 3 Second
 };
 
 const stopAutoPlay = () => {
@@ -75,25 +75,23 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <section class="relative h-600px overflow-hidden bg-gray-900" @mouseenter="stopAutoPlay" @mouseleave="startAutoPlay">
+    <section class="relative h-150 overflow-hidden bg-gray-900 rounded-xl" @mouseenter="stopAutoPlay" @mouseleave="startAutoPlay">
         <!-- All Slides (stacked) -->
-        <div 
-            v-for="(slide, index) in heroSlides" 
+        <div
+            v-for="(slide, index) in heroSlides"
             :key="slide.id"
             class="absolute inset-0 transition-opacity duration-700"
-            :class="currentSlide === index ? 'opacity-100 z-10' : 'opacity-0 z-0'"
-        >
+            :class="currentSlide === index ? 'opacity-100 z-10' : 'opacity-0 z-0'">
             <!-- Background Image with Overlay -->
             <div class="absolute inset-0">
                 <img :src="slide.image" :alt="slide.title" class="w-full h-full object-cover" />
-                <div :class="`absolute inset-0 bg-linear-to-r ${slide.color} opacity-80`"></div>
-                <div class="absolute inset-0 bg-black/20"></div>
+                <div class="absolute inset-0 bg-linear-to-r from-black/60 to-transparent"></div>
             </div>
-            
+
             <!-- Content -->
             <div class="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center">
                 <div class="max-w-2xl space-y-6">
-                    <div 
+                    <div
                         class="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-md rounded-full text-white text-sm font-semibold"
                         :style="{ animationDelay: currentSlide === index ? '0.2s' : '0s' }"
                         :class="currentSlide === index ? 'animate-fade-in-up' : 'opacity-0'"
@@ -101,33 +99,33 @@ onUnmounted(() => {
                         <Zap class="w-4 h-4" />
                         {{ slide.badge }}
                     </div>
-                    <h1 
-                        class="text-5xl md:text-7xl font-black text-white leading-tight drop-shadow-2xl"
+                        <h1
+                        class="text-5xl md:text-8xl font-light text-white leading-tight tracking-tight"
                         :style="{ animationDelay: currentSlide === index ? '0.4s' : '0s' }"
                         :class="currentSlide === index ? 'animate-fade-in-up' : 'opacity-0'"
                     >
-                        {{ slide.title }}
+                        {{ slide.title.split(' ').slice(0, -1).join(' ') }} <span class="font-bold italic">{{ slide.title.split(' ').slice(-1)[0] }}</span>
                     </h1>
-                    <p 
+                    <p
                         class="text-xl md:text-2xl text-white/90 font-light"
                         :style="{ animationDelay: currentSlide === index ? '0.6s' : '0s' }"
                         :class="currentSlide === index ? 'animate-fade-in-up' : 'opacity-0'"
                     >
                         {{ slide.description }}
                     </p>
-                    <div 
-                        class="flex items-center gap-4"
+                    <div
+                        class="flex items-center gap-4 pt-4"
                         :style="{ animationDelay: currentSlide === index ? '0.8s' : '0s' }"
                         :class="currentSlide === index ? 'animate-fade-in-up' : 'opacity-0'"
                     >
                         <RouterLink to="/product"
-                            class="px-8 py-4 bg-white text-gray-900 font-bold rounded-xl hover:bg-gray-100 transition-all duration-300 hover:scale-105 shadow-2xl flex items-center gap-2 group">
+                            class="px-8 py-4 bg-white text-gray-900 font-bold rounded-full hover:bg-black hover:text-white transition-all duration-500 hover:scale-105 shadow-2xl flex items-center gap-3 group">
                             {{ slide.cta }}
                             <ArrowRight class="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                         </RouterLink>
                         <button
-                            class="px-8 py-4 bg-white/10 backdrop-blur-md text-white font-bold rounded-xl border-2 border-white/30 hover:bg-white/20 transition-all duration-300">
-                            Learn More
+                            class="px-8 py-4 bg-white/5 backdrop-blur-md text-white font-bold rounded-full border border-white/20 hover:bg-white/10 transition-all duration-300">
+                            Explore More
                         </button>
                     </div>
                 </div>
@@ -136,12 +134,12 @@ onUnmounted(() => {
         
         <!-- Navigation Arrows -->
         <button @click="prevSlide"
-            class="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/20 backdrop-blur-md hover:bg-white/40 rounded-full flex items-center justify-center text-white transition-all duration-300 z-20 group"
+            class="absolute left-8 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/5 backdrop-blur-md hover:bg-white text-white hover:text-gray-900 border border-white/20 rounded-full flex items-center justify-center transition-all duration-500 z-20 group"
             aria-label="Previous slide">
             <ChevronLeft class="w-6 h-6 group-hover:-translate-x-1 transition-transform" />
         </button>
         <button @click="nextSlide"
-            class="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/20 backdrop-blur-md hover:bg-white/40 rounded-full flex items-center justify-center text-white transition-all duration-300 z-20 group"
+            class="absolute right-8 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/5 backdrop-blur-md hover:bg-white text-white hover:text-gray-900 border border-white/20 rounded-full flex items-center justify-center transition-all duration-500 z-20 group"
             aria-label="Next slide">
             <ChevronRight class="w-6 h-6 group-hover:translate-x-1 transition-transform" />
         </button>
