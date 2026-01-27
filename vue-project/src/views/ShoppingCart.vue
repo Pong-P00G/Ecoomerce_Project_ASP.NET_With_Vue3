@@ -33,13 +33,35 @@ const promoCode = ref('')
 const appliedPromo = ref(null)
 const promoError = ref('')
 
+// Helper to map cart items from API response
+const mapCartItems = (items) => {
+    if (!Array.isArray(items)) return []
+    return items.map(item => {
+        const product = item.productVariant?.product
+        const images = product?.productImages || []
+        const firstImage = images.length > 0 ? images[0].imageUrl : null
+        return {
+            id: item.cartItemId,
+            productId: product?.productId || item.productVariant?.productId,
+            name: product?.productName || 'Unknown Product',
+            image: firstImage,
+            price: item.price || item.productVariant?.price || 0,
+            quantity: item.quantity || 1,
+            inStock: (item.productVariant?.stockQuantity || 0) > 0
+        }
+    })
+}
+
 // Fetch cart
 const fetchCart = async () => {
     try {
         loading.value = true
         error.value = null
         const response = await cartApi.getCart()
-        cartItems.value = response.data.data || response.data || []
+        const cartData = response.data.data || response.data || {}
+        // Handle both array and object with items property
+        const items = Array.isArray(cartData) ? cartData : (cartData.items || [])
+        cartItems.value = mapCartItems(items)
     } catch (err) {
         error.value = err.response?.data?.message || 'Failed to load cart'
         console.error('Error fetching cart:', err)
@@ -353,6 +375,7 @@ onMounted(() => {
 
                         <!-- Checkout Button -->
                         <button
+                            @click="$router.push('/checkout')"
                             class="w-full py-4 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 transition-colors flex items-center justify-center gap-3 group mb-4">
                             <Lock class="w-5 h-5" />
                             <span>Secure Checkout</span>

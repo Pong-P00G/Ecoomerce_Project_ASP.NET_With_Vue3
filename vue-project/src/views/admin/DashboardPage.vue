@@ -13,7 +13,10 @@ import {
   RefreshCw,
   AlertTriangle
 } from 'lucide-vue-next'
-import {useToast as $router} from "../../composables/useToast.js";
+import { dashboardApi } from '../../api/dashboardApi.js';
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const loading = ref(false)
 const error = ref(null)
@@ -79,8 +82,23 @@ const fetchDashboardData = async (showRefreshing = false) => {
 
     const response = await dashboardApi.getAdminDashboard()
     dashboardData.value = response.data
-    users.value = response.data.users || []
-    products.value = response.data.products || []
+    
+    // Map users to ensure consistent property access
+    users.value = (response.data.users || []).map(u => ({
+      ...u,
+      id: u.userId,
+      role: u.role || 'User'
+    }))
+
+    // Map products to flat structure expected by template
+    products.value = (response.data.products || []).map(p => ({
+      ...p,
+      id: p.productId,
+      name: p.productName,
+      price: p.basePrice,
+      category: p.categories?.[0]?.categoryName || 'General' // Flatten category
+    }))
+
     recentActivities.value = response.data.recentActivities || response.data.activities || []
 
     // Set initial preview
@@ -394,7 +412,7 @@ onMounted(() => {
 
                     <div class="space-y-3">
                       <button
-                        @click="previewType === 'product' ? $router.push(`/admin/product?edit=${selectedItem?.id}`) : $router.push(`/admin/user?edit=${selectedItem?.id}`)"
+                        @click="previewType === 'product' ? router.push(`/admin/product?edit=${selectedItem?.id}`) : router.push(`/admin/user?edit=${selectedItem?.id}`)"
                         class="w-full py-4 bg-slate-900 text-white rounded-[20px] font-black uppercase tracking-widest text-xs hover:bg-slate-800 transition-all shadow-lg shadow-slate-200 active:scale-[0.98]">
                         Modify Profile
                       </button>

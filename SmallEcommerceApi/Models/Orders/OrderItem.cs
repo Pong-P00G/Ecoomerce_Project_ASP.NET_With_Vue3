@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using SmallEcommerceApi.Models.Products;
 
 namespace SmallEcommerceApi.Models.Orders
 {
@@ -15,6 +16,12 @@ namespace SmallEcommerceApi.Models.Orders
         [Column("product_variant_id")]
         public int ProductVariantId { get; set; }
 
+        [Column("product_name")]
+        public string ProductName { get; set; } = null!;
+
+        [Column("product_image")]
+        public string? ProductImage { get; set; }
+
         [Column("quantity")]
         public int Quantity { get; set; }
 
@@ -23,5 +30,9 @@ namespace SmallEcommerceApi.Models.Orders
 
         [Column("total_price")]
         public decimal TotalPrice { get; set; }
+
+        // Navigation properties
+        public Order Order { get; set; } = null!;
+        public ProductVariant ProductVariant { get; set; } = null!;
     }
 }

@@ -90,8 +90,17 @@ const fetchProducts = async () => {
     try {
         loading.value = true
         error.value = null
-        const response = await productAPI.getProducts()
-        products.value = response.data || []
+        // Use getAllProducts instead of getProducts, and request larger page size
+        const response = await productAPI.getAllProducts({ pageSize: 100 })
+        
+        products.value = (response.data.items || []).map(p => ({
+            id: p.productId,
+            name: p.productName,
+            category: p.categories?.[0]?.categoryName || 'Uncategorized',
+            sku: p.sku,
+            price: p.basePrice,
+            stock: p.stock
+        }))
     } catch (err) {
         error.value = err.response?.data?.message || 'Failed to fetch products'
         console.error('Error fetching products:', err)
@@ -229,7 +238,54 @@ onMounted(fetchProducts)
             <span class="text-xs font-black text-slate-400 uppercase tracking-widest">Refreshing Records...</span>
           </div>
         </div>
-        <div class="overflow-x-auto px-4">
+        <div>
+          <!-- Mobile View (Cards) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 lg:hidden">
+            <div v-for="product in filteredProducts" :key="product.id" 
+              class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm flex flex-col gap-4">
+              
+              <div class="flex items-center gap-4">
+                <div class="w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center shrink-0 border border-slate-100">
+                   <Package class="w-7 h-7 text-slate-300" />
+                </div>
+                <div class="min-w-0">
+                   <p class="text-sm font-bold text-slate-900 line-clamp-2 leading-tight">{{ product.name }}</p>
+                   <div class="flex items-center gap-2 mt-1">
+                     <span class="text-[10px] font-mono text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">{{ product.sku || 'N/A' }}</span>
+                     <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ product.category }}</span>
+                   </div>
+                </div>
+              </div>
+
+              <div class="bg-slate-50 rounded-xl p-4 border border-slate-100/50">
+                 <div class="flex justify-between items-end mb-2">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Current Level</p>
+                    <p :class="`text-xl font-black ${product.stock === 0 ? 'text-rose-600' : product.stock <= 10 ? 'text-amber-600' : 'text-emerald-600'}`">
+                      {{ product.stock }}
+                    </p>
+                 </div>
+                 <div class="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                    <div class="h-full transition-all duration-1000"
+                      :class="product.stock === 0 ? 'bg-rose-500' : product.stock <= 10 ? 'bg-amber-500' : 'bg-emerald-500'"
+                      :style="{ width: Math.min((product.stock / 100) * 100, 100) + '%' }"></div>
+                 </div>
+              </div>
+
+              <div class="flex items-center justify-between pt-2">
+                 <div>
+                    <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Unit Price</p>
+                    <p class="text-sm font-black text-slate-900">${{ product.price.toLocaleString() }}</p>
+                 </div>
+                 <button @click="openUpdateModal(product)"
+                    class="flex items-center gap-2 px-4 py-3 bg-slate-900 text-white rounded-xl font-bold text-xs shadow-lg shadow-slate-200 hover:bg-slate-800 transition-all active:scale-95">
+                    <Edit2 class="w-4 h-4" />
+                    Adjust
+                 </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="hidden lg:block overflow-x-auto px-4">
           <table class="w-full border-separate border-spacing-y-4">
             <thead>
               <tr>
@@ -308,6 +364,7 @@ onMounted(fetchProducts)
               </tr>
             </tbody>
           </table>
+        </div>
         </div>
 
         <div v-if="loading && products.length === 0" class="p-32 flex flex-col items-center justify-center gap-6">

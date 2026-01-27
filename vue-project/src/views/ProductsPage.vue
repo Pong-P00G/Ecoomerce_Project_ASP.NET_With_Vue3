@@ -26,7 +26,7 @@ const wishlistStore = useWishlistStore();
 const viewMode = ref('grid');
 const searchQuery = ref('');
 const selectedCategory = ref('All');
-const priceRange = ref([0, 500]);
+const priceRange = ref([0, 10000]);
 const sortBy = ref('featured');
 const showFilters = ref(false);
 const loading = ref(false);
@@ -111,14 +111,18 @@ const fetchProducts = async () => {
     });
     console.log('API Response:', response);
 
-    // Handle different response structures
+    // Handle API response structure
     let productsData = [];
 
     if (response.data?.items) {
-      productsData = response;
+      productsData = response.data.items;
     } else if (Array.isArray(response.data)) {
       productsData = response.data;
+    } else {
+      console.warn('Unexpected API response structure:', response);
+      productsData = [];
     }
+
     console.log('Products Data:', productsData);
     console.log('Products Count:', productsData.length);
 
@@ -316,14 +320,14 @@ onMounted(() => {
                       v-model.number="priceRange[0]"
                       type="range"
                       min="0"
-                      max="500"
+                      max="10000"
                       class="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-gray-900"
                   />
                   <input
                       v-model.number="priceRange[1]"
                       type="range"
                       min="0"
-                      max="500"
+                      max="10000"
                       class="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-gray-900"
                   />
                 </div>
@@ -402,7 +406,7 @@ onMounted(() => {
                   </div>
 
                   <!-- Quick Add Overlay -->
-                  <div class="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-4 group-hover:translate-y-0">
+                  <div class="absolute inset-x-0 bottom-0 p-4 bg-linear-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-4 group-hover:translate-y-0">
                     <button
                         @click="(e) => addToCart(product.id, e)"
                         :disabled="!product.inStock"
@@ -441,8 +445,8 @@ onMounted(() => {
                     <span v-if="product.originalPrice" class="text-sm text-gray-400 line-through">${{ product.originalPrice }}</span>
                   </div>
                   <span class="text-xs font-semibold text-gray-600 bg-gray-100 px-3 py-1.5 rounded-full">
-                                        {{ product.category }}
-                                    </span>
+                    {{ product.category }}
+                  </span>
                 </div>
               </div>
             </div>
@@ -456,14 +460,14 @@ onMounted(() => {
                 class="group bg-white rounded-3xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-500 border border-gray-100"
             >
               <div class="flex flex-col md:flex-row">
-                <RouterLink :to="`/product/${product.id}`" class="block md:w-80 flex-shrink-0">
-                  <div class="relative w-full h-64 md:h-full overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200">
+                <RouterLink :to="`/product/${product.id}`" class="block md:w-80 shrink-0">
+                  <div class="relative w-full h-64 md:h-full overflow-hidden bg-linear-to-br from-gray-100 to-gray-200">
                     <img
                         :src="product.image"
                         :alt="product.name"
                         class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />
-                    <div v-if="product.badge" class="absolute top-4 left-4 px-4 py-1.5 bg-gradient-to-r from-violet-600 to-purple-600 text-white text-xs font-bold rounded-full shadow-lg">
+                    <div v-if="product.badge" class="absolute top-4 left-4 px-4 py-1.5 bg-linear-to-r from-violet-600 to-purple-600 text-white text-xs font-bold rounded-full shadow-lg">
                       {{ product.badge }}
                     </div>
                   </div>
@@ -479,7 +483,7 @@ onMounted(() => {
                       </RouterLink>
                       <button
                           @click="(e) => handleAddToWishlist(product, e)"
-                          class="w-12 h-12 rounded-2xl flex items-center justify-center hover:bg-gray-100 transition-all duration-300 flex-shrink-0"
+                          class="w-12 h-12 rounded-2xl flex items-center justify-center hover:bg-gray-100 transition-all duration-300 shrink-0"
                       >
                         <Heart class="w-6 h-6 text-gray-700 hover:text-red-500 transition-colors" />
                       </button>
@@ -516,7 +520,7 @@ onMounted(() => {
                     <button
                         @click="(e) => addToCart(product.id, e)"
                         :disabled="!product.inStock"
-                        class="px-8 py-4 bg-gradient-to-r from-violet-600 to-purple-600 text-white font-bold rounded-2xl hover:shadow-2xl hover:shadow-violet-600/50 transition-all duration-300 flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-1"
+                        class="px-8 py-4 bg-linear-to-r from-violet-600 to-purple-600 text-white font-bold rounded-2xl hover:shadow-2xl hover:shadow-violet-600/50 transition-all duration-300 flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-1"
                     >
                       <ShoppingCart class="w-5 h-5" />
                       {{ product.inStock ? 'Add to Cart' : 'Unavailable' }}
@@ -530,14 +534,14 @@ onMounted(() => {
 
         <!-- No Results -->
         <div v-else class="text-center py-32">
-          <div class="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full mb-8 shadow-lg">
+          <div class="inline-flex items-center justify-center w-24 h-24 bg-linear-to-br from-gray-100 to-gray-200 rounded-full mb-8 shadow-lg">
             <Search class="w-12 h-12 text-gray-400" />
           </div>
           <h3 class="text-3xl font-bold text-gray-900 mb-3">No products found</h3>
           <p class="text-gray-600 text-lg mb-8">Try adjusting your filters or search terms to find what you're looking for</p>
           <button
               @click="clearFilters"
-              class="px-8 py-4 bg-gradient-to-r from-violet-600 to-purple-600 text-white font-bold rounded-2xl hover:shadow-2xl hover:shadow-violet-600/50 transition-all duration-300 transform hover:-translate-y-1"
+              class="px-8 py-4 bg-linear-to-r from-violet-600 to-purple-600 text-white font-bold rounded-2xl hover:shadow-2xl hover:shadow-violet-600/50 transition-all duration-300 transform hover:-translate-y-1"
           >
             Clear All Filters
           </button>

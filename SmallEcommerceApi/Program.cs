@@ -1,15 +1,22 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
 using SmallEcommerceApi.Db;
+using SmallEcommerceApi.Models.Users;
+using SmallEcommerceApi.Security.Api.Security;
 using SmallEcommerceApi.Services;
 using SmallEcommerceApi.Services.Interfaces;
+using SmallEcommerceApi.Settings;
+using System.Text;
 using System.Text.Json;
 
 namespace SmallEcommerceApi
 {
     public partial class Program
     {
-        private static void Main(string[] args)
+        private static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -17,36 +24,97 @@ namespace SmallEcommerceApi
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DbConnection")));
 
-            // Add services to the container.
+            // Add controllers with JSON options
             builder.Services.AddControllers()
                 .AddJsonOptions(options =>
                 {
                     options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
                     options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+                    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
                 });
 
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+            // OpenAPI configuration
             builder.Services.AddOpenApi();
 
-            // Services registration
-            builder.Services.AddScoped<ICouponService, CouponService>();
-            builder.Services.AddScoped<IAddressService, AddressService>();
-            builder.Services.AddScoped<IPasswordResetService, PasswordResetService>();
-            builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+            // JWT Settings
+            var jwtSettings = new JwtSettings();
+            builder.Configuration.GetSection("JwtSettings").Bind(jwtSettings);
+            builder.Services.AddSingleton(jwtSettings);
 
-            // Cors
+            // Service registration (Register interfaces with implementations)
+            builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
+            builder.Services.AddScoped<ITokenService, TokenService>();
+            builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<ICartService, CartService>();
+            builder.Services.AddScoped<IWishlistService, WishlistService>();
+            builder.Services.AddScoped<IOrderService, OrderService>();
+
+            // Backward compatibility: Also register concrete classes
+            builder.Services.AddScoped<JwtService>();
+            builder.Services.AddScoped<TokenService>();
+            builder.Services.AddScoped<PasswordHasher>();
+
+            // CORS configuration
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowVueApp", policy =>
                 {
-                    policy.WithOrigins("https://localhost:3000, http://localhost:3000")
+                    policy.WithOrigins("http://localhost:3000", "https://localhost:3000")
                       .AllowAnyHeader()
                       .AllowAnyMethod()
                       .AllowCredentials();
                 });
             });
 
-            // BUILD THE APP AFTER ALL SERVICES ARE REGISTERED
+            // JWT Authentication
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = jwtSettings.Issuer,
+                        ValidAudience = jwtSettings.Audience,
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(jwtSettings.SecretKey ?? string.Empty)),
+                        ClockSkew = TimeSpan.Zero,
+                        RoleClaimType = ClaimTypes.Role,
+                        NameClaimType = ClaimTypes.Name
+                    };
+
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnAuthenticationFailed = context =>
+                        {
+                            var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+                            logger.LogError($"Authentication Failed: {context.Exception.Message}");
+                            return Task.CompletedTask;
+                        },
+                        OnTokenValidated = context =>
+                        {
+                            var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+                            logger.LogInformation("Token Validated Successfully");
+                            return Task.CompletedTask;
+                        },
+                        OnChallenge = context =>
+                        {
+                            var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+                            logger.LogWarning($"OnChallenge: {context.Error}, {context.ErrorDescription}");
+                            return Task.CompletedTask;
+                        }
+                    };
+                });
+
+            // Authorization policies
+            builder.Services.AddAuthorizationBuilder()
+                .AddPolicy("AdminOnly", policy => policy.RequireClaim(ClaimTypes.Role, "ADMIN"))
+                .AddPolicy("CustomerOrAdmin", policy => policy.RequireClaim(ClaimTypes.Role, "ADMIN", "CUSTOMER"));
+
+            // Build the app
             var app = builder.Build();
 
             // Ensure database is created (Development only)
@@ -58,6 +126,18 @@ namespace SmallEcommerceApi
                     try
                     {
                         dbContext.Database.EnsureCreated();
+
+                        // Seed Roles if not exist
+                        if (!dbContext.UserRoles.Any())
+                        {
+                            dbContext.UserRoles.AddRange(
+                                new UserRole { RoleName = "ADMIN", Description = "Administrator role" },
+                                new UserRole { RoleName = "CUSTOMER", Description = "Standard customer role" }
+                            );
+                            dbContext.SaveChanges();
+                        }
+
+
                     }
                     catch (Exception ex)
                     {
@@ -67,14 +147,23 @@ namespace SmallEcommerceApi
                     }
                 }
 
+                // Map OpenAPI endpoint
                 app.MapOpenApi();
-                app.MapScalarApiReference();
+                
+                // Map Scalar API documentation UI
+                app.MapScalarApiReference(options =>
+                {
+                    options
+                        .WithTitle("SmallEcommerce API")
+                        .WithTheme(ScalarTheme.Purple)
+                        .WithDefaultHttpClient(ScalarTarget.CSharp, ScalarClient.HttpClient);
+                });
             }
 
-            // USE CORS MIDDLEWARE (this stays after builder.Build())
+            // Configure middleware pipeline (order matters!)
             app.UseCors("AllowVueApp");
-            //app.UseRouting();
             app.UseHttpsRedirection();
+            app.UseAuthentication();
             app.UseAuthorization();
             app.MapControllers();
 

@@ -43,9 +43,17 @@ const routes = [
                 component: () => import("../views/ContactPage.vue")
             },
             {
-                name: "Cart",
+                name: 'Cart',
                 path: '/cart',
                 component: () => import("../views/ShoppingCart.vue")
+            },
+            {
+                name: 'Checkout',
+                path: '/checkout',
+                component: () => import("../views/CheckoutPage.vue"),
+                meta: {
+                    title: 'Secure Checkout - AlieeShop'
+                }
             },
             {
                 name: 'Wishlist',
@@ -105,13 +113,12 @@ const routes = [
     {
         path: "/admin",
         component: DashLayout,
-        // meta: { requiresAuth: true, role: 'admin' },
+        meta: { requiresAuth: true, role: 'admin' },
         children: [
             {
                 path: '/admin/dashboard',
                 name: 'AdminDashboard',
                 component: () => import('../views/admin/DashboardPage.vue'),
-                // meta: { requiresAuth: true, role: 'admin' }
             },
             {
                 path: '/admin/product',
@@ -146,8 +153,18 @@ const router = createRouter({
 // Navigation guards
 router.beforeEach((to, from, next) => {
     const authStore = useAuthStore();
+    // Initialize auth state from local storage if needed
+    if (!authStore.user) {
+        authStore.initializeAuth();
+    }
+    
     const isAuthenticated = authStore.isAuthenticated;
-    const userRole = authStore.user?.role;
+    // Use the getter from the store, or fallback to properties
+    const userRole = authStore.userRole || authStore.user?.roleName || authStore.user?.role;
+    
+    // Normalize role for comparison (backend might send 'Admin', route expects 'admin')
+    const normalizedUserRole = userRole ? String(userRole).toLowerCase() : null;
+
     // Update page title
     if (to.meta.title) {
         document.title = to.meta.title;
@@ -164,7 +181,7 @@ router.beforeEach((to, from, next) => {
     // Guest only pages (login, register, forgot password)
     if (to.meta.guest && isAuthenticated) {
         // If user is already logged in, redirect based on role
-        if (userRole === 'admin') {
+        if (normalizedUserRole === 'admin') {
             return next('/admin/dashboard');
         } else {
             return next('/');
@@ -177,14 +194,18 @@ router.beforeEach((to, from, next) => {
     }
 
     // Role-based access
-    if (to.meta.role && userRole !== to.meta.role) {
-        // User doesn't have the required role
-        if (userRole === 'admin') {
-            return next('/admin/dashboard');
-        } else if (userRole === 'customer') {
-            return next('/');
-        } else {
-            return next('/login');
+    if (to.meta.role) {
+        const requiredRole = String(to.meta.role).toLowerCase();
+        
+        if (normalizedUserRole !== requiredRole) {
+            // User doesn't have the required role
+            if (normalizedUserRole === 'admin') {
+                return next('/admin/dashboard');
+            } else if (normalizedUserRole === 'customer') {
+                return next('/');
+            } else {
+                return next('/login');
+            }
         }
     }
 

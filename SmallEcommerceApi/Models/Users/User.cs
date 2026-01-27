@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+using SmallEcommerceApi.Models.Auth;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SmallEcommerceApi.Models.Users
@@ -22,27 +23,28 @@ namespace SmallEcommerceApi.Models.Users
         [Column("password_hash")]
         public string PasswordHash { get; set; } = null!;
 
+        [NotMapped]
         [Column("first_name")]
-        public string? FirstName { get; set; }
+        public string FirstName { get; set; } = null!;
+
+        [Column("mid_name")]
+        public string? MidName { get; set; }
 
         [Column("last_name")]
-        public string? LastName { get; set; }
+        public string LastName { get; set; } = null!;
 
-        // Computed column → DO NOT INSERT / UPDATE
-        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
         [Column("full_name")]
-        public string? FullName { get; private set; }
+        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        public string? FullName { get; set; }
 
         [Column("is_active")]
-        public bool IsActive { get; set; }
-
-        [Column("last_login")]
-        public DateTime? LastLogin { get; set; }
-
-        [Column("created_at")]
+        public bool IsActive { get; set; } = true;
         public DateTime CreatedAt { get; set; }
-
-        [Column("updated_at")]
         public DateTime UpdatedAt { get; set; }
+        public DateTime LastLogin { get; internal set; }
+
+        public virtual UserRole? Role { get; set; }
+        public virtual UserProfile? Profile { get; set; }
+        public virtual ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
     }
 }

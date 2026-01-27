@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Test Product</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, textarea { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; }
+        button { background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #218838; }
+        .result { margin-top: 20px; padding: 10px; background: #f8f9fa; border-radius: 4px; white-space: pre-wrap; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>Create Test Product</h1>
+    
+    <form id="productForm">
+        <div class="form-group">
+            <label for="productName">Product Name</label>
+            <input type="text" id="productName" value="Test Product" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" rows="3">A test product for the e-commerce API</textarea>
+        </div>
+        
+        <div class="form-group">
+            <label for="basePrice">Base Price</label>
+            <input type="number" id="basePrice" step="0.01" value="29.99" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="stock">Stock</label>
+            <input type="number" id="stock" value="100" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="minStock">Min Stock</label>
+            <input type="number" id="minStock" value="10" required>
+        </div>
+        
+        <button type="submit">Create Product</button>
+    </form>
+    
+    <div id="result" class="result"></div>
+
+    <script>
+        document.getElementById('productForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Creating product...';
+            resultDiv.className = 'result';
+            
+            const product = {
+                productName: document.getElementById('productName').value,
+                description: document.getElementById('description').value,
+                basePrice: parseFloat(document.getElementById('basePrice').value),
+                stock: parseInt(document.getElementById('stock').value),
+                minStock: parseInt(document.getElementById('minStock').value),
+                isActive: true,
+                featured: true,
+                variants: [
+                    {
+                        sku: "TEST-001",
+                        price: parseFloat(document.getElementById('basePrice').value),
+                        stockQuantity: parseInt(document.getElementById('stock').value),
+                        isActive: true,
+                        options: []
+                    }
+                ]
+            };
+            
+            try {
+                const response = await fetch('https://localhost:5001/api/products', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(product),
+                    // For self-signed certificates
+                    mode: 'cors',
+                    credentials: 'omit'
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.innerHTML = `✅ Product created successfully!\n${JSON.stringify(data, null, 2)}`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.innerHTML = `❌ Failed to create product:\n${JSON.stringify(data, null, 2)}`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `❌ Error: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        });
+    </script>
+</body>
+</html>

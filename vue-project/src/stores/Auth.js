@@ -1,121 +1,60 @@
 import { defineStore } from 'pinia'
 import { authAPI } from '../api/authApi'
 
+
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    user: null,
-    accessToken: localStorage.getItem('accessToken'),
-    refreshToken: localStorage.getItem('refreshToken'),
-    isAuthenticated: false
+    user: JSON.parse(localStorage.getItem('user') || 'null'),
+    token: localStorage.getItem('accessToken')
   }),
 
   getters: {
-    currentUser: (state) => state.user,
-    isAdmin: (state) => state.user?.role === 'ADMIN',
-    isCustomer: (state) => state.user?.role === 'CUSTOMER'
+    isAuthenticated: (state) => !!state.token,
+    userRole: (state) => state.user?.roleName || state.user?.role || null
   },
 
   actions: {
-    async register(registerData) {
-      try {
-        const response = await authAPI.register(registerData)
-        if (response.data.succeeded) {
-          this.setAuth(response.data.data)
-          return response.data
-        }
-      } catch (error) {
-        throw new Error(error.response?.data?.message || 'Registration failed')
+    async login(payload) {
+      const res = await authAPI.login(payload)
+      // Handle different response structures
+      this.token = res.data.accessToken || res.data.token
+      this.user = res.data.user
+      
+      if (this.token) {
+        localStorage.setItem('accessToken', this.token)
       }
-    },
-
-    async login(credentials) {
-      try {
-        const response = await authAPI.login(credentials)
-        if (response.data.succeeded) {
-          this.setAuth(response.data.data)
-          return response.data
-        }
-      } catch (error) {
-        throw new Error(error.response?.data?.message || 'Login failed')
+      if (res.data.user) {
+        localStorage.setItem('user', JSON.stringify(res.data.user))
       }
+      return res
     },
 
-    async logout() {
-      try {
-        await authAPI.logout()
-      } catch (error) {
-        console.error('Logout error:', error)
-      } finally {
-        this.clearAuth()
-      }
+    async register(payload) {
+      const res = await authAPI.register(payload)
+      return res
     },
 
-    async refreshToken() {
-      try {
-        const response = await authAPI.refreshToken(this.refreshToken)
-        if (response.data.succeeded) {
-          this.setAuth(response.data.data)
-          return response.data.data.accessToken
-        }
-      } catch (error) {
-        this.clearAuth()
-        throw error
-      }
-    },
-
-    async getCurrentUser() {
-      try {
-        const response = await authAPI.getCurrentUser()
-        if (response.data.succeeded) {
-          this.user = response.data.data
-          this.isAuthenticated = true
-        }
-      } catch (error) {
-        this.clearAuth()
-      }
-    },
-
-    async forgotPassword(email) {
-      try {
-        const response = await authAPI.forgotPassword({ email })
-        return response.data
-      } catch (error) {
-        throw new Error(error.response?.data?.message || 'Failed to send reset email')
-      }
-    },
-
-    // async resetPassword(resetData) {
-    //   try {
-    //     const response = await authAPI.resetPassword(resetData)
-    //     return response.data
-    //   } catch (error) {
-    //     throw new Error(error.response?.data?.message || 'Password reset failed')
-    //   }
-    // },
-
-    setAuth(authData) {
-      this.accessToken = authData.accessToken
-      this.refreshToken = authData.refreshToken
-      this.user = authData.user
-      this.isAuthenticated = true
-
-      localStorage.setItem('accessToken', authData.accessToken)
-      localStorage.setItem('refreshToken', authData.refreshToken)
-    },
-
-    clearAuth() {
+    logout() {
       this.user = null
-      this.accessToken = null
-      this.refreshToken = null
-      this.isAuthenticated = false
-
+      this.token = null
       localStorage.removeItem('accessToken')
       localStorage.removeItem('refreshToken')
+      localStorage.removeItem('user')
     },
 
+    // Initialize from localStorage on app start
     initializeAuth() {
-      if (this.accessToken) {
-        this.getCurrentUser()
+      const token = localStorage.getItem('accessToken')
+      const user = localStorage.getItem('user')
+      if (token) {
+        this.token = token
+      }
+      if (user) {
+        try {
+          this.user = JSON.parse(user)
+        } catch (e) {
+          this.user = null
+        }
       }
     }
   }

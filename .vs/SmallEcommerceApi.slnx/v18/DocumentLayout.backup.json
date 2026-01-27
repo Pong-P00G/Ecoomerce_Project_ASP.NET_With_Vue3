@@ -3,20 +3,48 @@
   "WorkspaceRootPath": "C:\\Users\\pong7\\OneDrive\\Documents\\Assignment ASP.NET\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{16A4A65F-9BEF-847A-EADF-B0CB05AFD481}|SmallEcommerceApi\\SmallEcommerceApi.csproj|c:\\users\\pong7\\onedrive\\documents\\assignment asp.net\\smallecommerceapi\\controllers\\products\\productcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{16A4A65F-9BEF-847A-EADF-B0CB05AFD481}|SmallEcommerceApi\\SmallEcommerceApi.csproj|solutionrelative:smallecommerceapi\\controllers\\products\\productcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{16A4A65F-9BEF-847A-EADF-B0CB05AFD481}|SmallEcommerceApi\\SmallEcommerceApi.csproj|c:\\users\\pong7\\onedrive\\documents\\assignment asp.net\\smallecommerceapi\\dtos\\auth\\authdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{16A4A65F-9BEF-847A-EADF-B0CB05AFD481}|SmallEcommerceApi\\SmallEcommerceApi.csproj|solutionrelative:smallecommerceapi\\dtos\\auth\\authdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{16A4A65F-9BEF-847A-EADF-B0CB05AFD481}|SmallEcommerceApi\\SmallEcommerceApi.csproj|c:\\users\\pong7\\onedrive\\documents\\assignment asp.net\\smallecommerceapi\\dtos\\products\\productvariantdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{16A4A65F-9BEF-847A-EADF-B0CB05AFD481}|SmallEcommerceApi\\SmallEcommerceApi.csproj|solutionrelative:smallecommerceapi\\dtos\\products\\productvariantdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{16A4A65F-9BEF-847A-EADF-B0CB05AFD481}|SmallEcommerceApi\\SmallEcommerceApi.csproj|c:\\users\\pong7\\onedrive\\documents\\assignment asp.net\\smallecommerceapi\\services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{16A4A65F-9BEF-847A-EADF-B0CB05AFD481}|SmallEcommerceApi\\SmallEcommerceApi.csproj|solutionrelative:smallecommerceapi\\services\\authservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{16A4A65F-9BEF-847A-EADF-B0CB05AFD481}|SmallEcommerceApi\\SmallEcommerceApi.csproj|c:\\users\\pong7\\onedrive\\documents\\assignment asp.net\\smallecommerceapi\\models\\products\\productvariantoption.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{16A4A65F-9BEF-847A-EADF-B0CB05AFD481}|SmallEcommerceApi\\SmallEcommerceApi.csproj|solutionrelative:smallecommerceapi\\models\\products\\productvariantoption.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{16A4A65F-9BEF-847A-EADF-B0CB05AFD481}|SmallEcommerceApi\\SmallEcommerceApi.csproj|c:\\users\\pong7\\onedrive\\documents\\assignment asp.net\\smallecommerceapi\\settings\\jwtsettings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{16A4A65F-9BEF-847A-EADF-B0CB05AFD481}|SmallEcommerceApi\\SmallEcommerceApi.csproj|solutionrelative:smallecommerceapi\\settings\\jwtsettings.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{16A4A65F-9BEF-847A-EADF-B0CB05AFD481}|SmallEcommerceApi\\SmallEcommerceApi.csproj|c:\\users\\pong7\\onedrive\\documents\\assignment asp.net\\smallecommerceapi\\models\\users\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{16A4A65F-9BEF-847A-EADF-B0CB05AFD481}|SmallEcommerceApi\\SmallEcommerceApi.csproj|solutionrelative:smallecommerceapi\\models\\users\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{16A4A65F-9BEF-847A-EADF-B0CB05AFD481}|SmallEcommerceApi\\SmallEcommerceApi.csproj|c:\\users\\pong7\\onedrive\\documents\\assignment asp.net\\smallecommerceapi\\controllers\\auth\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{16A4A65F-9BEF-847A-EADF-B0CB05AFD481}|SmallEcommerceApi\\SmallEcommerceApi.csproj|solutionrelative:smallecommerceapi\\controllers\\auth\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{16A4A65F-9BEF-847A-EADF-B0CB05AFD481}|SmallEcommerceApi\\SmallEcommerceApi.csproj|c:\\users\\pong7\\onedrive\\documents\\assignment asp.net\\smallecommerceapi\\services\\jwtservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{16A4A65F-9BEF-847A-EADF-B0CB05AFD481}|SmallEcommerceApi\\SmallEcommerceApi.csproj|solutionrelative:smallecommerceapi\\services\\jwtservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{16A4A65F-9BEF-847A-EADF-B0CB05AFD481}|SmallEcommerceApi\\SmallEcommerceApi.csproj|c:\\users\\pong7\\onedrive\\documents\\assignment asp.net\\smallecommerceapi\\services\\tokenservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{16A4A65F-9BEF-847A-EADF-B0CB05AFD481}|SmallEcommerceApi\\SmallEcommerceApi.csproj|solutionrelative:smallecommerceapi\\services\\tokenservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{16A4A65F-9BEF-847A-EADF-B0CB05AFD481}|SmallEcommerceApi\\SmallEcommerceApi.csproj|c:\\users\\pong7\\onedrive\\documents\\assignment asp.net\\smallecommerceapi\\services\\interfaces\\iuserservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{16A4A65F-9BEF-847A-EADF-B0CB05AFD481}|SmallEcommerceApi\\SmallEcommerceApi.csproj|solutionrelative:smallecommerceapi\\services\\interfaces\\iuserservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{16A4A65F-9BEF-847A-EADF-B0CB05AFD481}|SmallEcommerceApi\\SmallEcommerceApi.csproj|c:\\users\\pong7\\onedrive\\documents\\assignment asp.net\\smallecommerceapi\\controllers\\auth\\userscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{16A4A65F-9BEF-847A-EADF-B0CB05AFD481}|SmallEcommerceApi\\SmallEcommerceApi.csproj|solutionrelative:smallecommerceapi\\controllers\\auth\\userscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{16A4A65F-9BEF-847A-EADF-B0CB05AFD481}|SmallEcommerceApi\\SmallEcommerceApi.csproj|c:\\users\\pong7\\onedrive\\documents\\assignment asp.net\\smallecommerceapi\\db\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{16A4A65F-9BEF-847A-EADF-B0CB05AFD481}|SmallEcommerceApi\\SmallEcommerceApi.csproj|solutionrelative:smallecommerceapi\\db\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{16A4A65F-9BEF-847A-EADF-B0CB05AFD481}|SmallEcommerceApi\\SmallEcommerceApi.csproj|c:\\users\\pong7\\onedrive\\documents\\assignment asp.net\\smallecommerceapi\\services\\userservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{16A4A65F-9BEF-847A-EADF-B0CB05AFD481}|SmallEcommerceApi\\SmallEcommerceApi.csproj|solutionrelative:smallecommerceapi\\services\\userservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{16A4A65F-9BEF-847A-EADF-B0CB05AFD481}|SmallEcommerceApi\\SmallEcommerceApi.csproj|c:\\users\\pong7\\onedrive\\documents\\assignment asp.net\\smallecommerceapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -30,74 +58,172 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 11,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\pong7\\OneDrive\\Documents\\Assignment ASP.NET\\SmallEcommerceApi\\Program.cs",
               "RelativeDocumentMoniker": "SmallEcommerceApi\\Program.cs",
               "ToolTip": "C:\\Users\\pong7\\OneDrive\\Documents\\Assignment ASP.NET\\SmallEcommerceApi\\Program.cs",
               "RelativeToolTip": "SmallEcommerceApi\\Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAADwvwAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAADwAAAAAAAAAAAAmwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-02T14:14:07.286Z",
+              "WhenOpened": "2026-01-20T00:26:18.551Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "AppDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\pong7\\OneDrive\\Documents\\Assignment ASP.NET\\SmallEcommerceApi\\Db\\AppDbContext.cs",
+              "RelativeDocumentMoniker": "SmallEcommerceApi\\Db\\AppDbContext.cs",
+              "ToolTip": "C:\\Users\\pong7\\OneDrive\\Documents\\Assignment ASP.NET\\SmallEcommerceApi\\Db\\AppDbContext.cs",
+              "RelativeToolTip": "SmallEcommerceApi\\Db\\AppDbContext.cs",
+              "ViewState": "AgIAABYBAAAAAAAAAAAUwCMBAABFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-20T00:26:23.625Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "UsersController.cs",
+              "DocumentMoniker": "C:\\Users\\pong7\\OneDrive\\Documents\\Assignment ASP.NET\\SmallEcommerceApi\\Controllers\\Auth\\UsersController.cs",
+              "RelativeDocumentMoniker": "SmallEcommerceApi\\Controllers\\Auth\\UsersController.cs",
+              "ToolTip": "C:\\Users\\pong7\\OneDrive\\Documents\\Assignment ASP.NET\\SmallEcommerceApi\\Controllers\\Auth\\UsersController.cs",
+              "RelativeToolTip": "SmallEcommerceApi\\Controllers\\Auth\\UsersController.cs",
+              "ViewState": "AgIAAAIAAAAAAAAAAAAswBsAAAAKAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-20T00:47:31.314Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "AuthController.cs",
+              "DocumentMoniker": "C:\\Users\\pong7\\OneDrive\\Documents\\Assignment ASP.NET\\SmallEcommerceApi\\Controllers\\Auth\\AuthController.cs",
+              "RelativeDocumentMoniker": "SmallEcommerceApi\\Controllers\\Auth\\AuthController.cs",
+              "ToolTip": "C:\\Users\\pong7\\OneDrive\\Documents\\Assignment ASP.NET\\SmallEcommerceApi\\Controllers\\Auth\\AuthController.cs",
+              "RelativeToolTip": "SmallEcommerceApi\\Controllers\\Auth\\AuthController.cs",
+              "ViewState": "AgIAAA4AAAAAAAAAAAAAwC0AAAAMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-20T00:47:30.251Z",
               "IsPinned": true,
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 3,
-              "Title": "AppDbContext.cs",
-              "DocumentMoniker": "C:\\Users\\pong7\\OneDrive\\Documents\\Assignment ASP.NET\\SmallEcommerceApi\\Db\\AppDbContext.cs",
-              "RelativeDocumentMoniker": "SmallEcommerceApi\\Db\\AppDbContext.cs",
-              "ToolTip": "C:\\Users\\pong7\\OneDrive\\Documents\\Assignment ASP.NET\\SmallEcommerceApi\\Db\\AppDbContext.cs",
-              "RelativeToolTip": "SmallEcommerceApi\\Db\\AppDbContext.cs",
-              "ViewState": "AgIAALUAAAAAAAAAAAAmwM0AAAAxAAAAAAAAAA==",
+              "Title": "User.cs",
+              "DocumentMoniker": "C:\\Users\\pong7\\OneDrive\\Documents\\Assignment ASP.NET\\SmallEcommerceApi\\Models\\Users\\User.cs",
+              "RelativeDocumentMoniker": "SmallEcommerceApi\\Models\\Users\\User.cs",
+              "ToolTip": "C:\\Users\\pong7\\OneDrive\\Documents\\Assignment ASP.NET\\SmallEcommerceApi\\Models\\Users\\User.cs",
+              "RelativeToolTip": "SmallEcommerceApi\\Models\\Users\\User.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvygAAAAyAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-02T14:14:12.097Z",
-              "IsPinned": true,
+              "WhenOpened": "2026-01-20T04:26:56.264Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "ProductController.cs",
-              "DocumentMoniker": "C:\\Users\\pong7\\OneDrive\\Documents\\Assignment ASP.NET\\SmallEcommerceApi\\Controllers\\Products\\ProductController.cs",
-              "RelativeDocumentMoniker": "SmallEcommerceApi\\Controllers\\Products\\ProductController.cs",
-              "ToolTip": "C:\\Users\\pong7\\OneDrive\\Documents\\Assignment ASP.NET\\SmallEcommerceApi\\Controllers\\Products\\ProductController.cs",
-              "RelativeToolTip": "SmallEcommerceApi\\Controllers\\Products\\ProductController.cs",
-              "ViewState": "AgIAAHIAAAAAAAAAAAAwwIUAAAAwAAAAAAAAAA==",
+              "DocumentIndex": 5,
+              "Title": "JwtService.cs",
+              "DocumentMoniker": "C:\\Users\\pong7\\OneDrive\\Documents\\Assignment ASP.NET\\SmallEcommerceApi\\Services\\JwtService.cs",
+              "RelativeDocumentMoniker": "SmallEcommerceApi\\Services\\JwtService.cs",
+              "ToolTip": "C:\\Users\\pong7\\OneDrive\\Documents\\Assignment ASP.NET\\SmallEcommerceApi\\Services\\JwtService.cs",
+              "RelativeToolTip": "SmallEcommerceApi\\Services\\JwtService.cs",
+              "ViewState": "AgIAAAsAAAAAAAAAAAA3wBoAAABRAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-02T14:14:13.477Z",
-              "IsPinned": true,
+              "WhenOpened": "2026-01-20T04:12:55.375Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "TokenService.cs",
+              "DocumentMoniker": "C:\\Users\\pong7\\OneDrive\\Documents\\Assignment ASP.NET\\SmallEcommerceApi\\Services\\TokenService.cs",
+              "RelativeDocumentMoniker": "SmallEcommerceApi\\Services\\TokenService.cs",
+              "ToolTip": "C:\\Users\\pong7\\OneDrive\\Documents\\Assignment ASP.NET\\SmallEcommerceApi\\Services\\TokenService.cs",
+              "RelativeToolTip": "SmallEcommerceApi\\Services\\TokenService.cs",
+              "ViewState": "AgIAAD8AAAAAAAAAAAAkwGUAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-20T04:19:50.955Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "IUserService.cs",
+              "DocumentMoniker": "C:\\Users\\pong7\\OneDrive\\Documents\\Assignment ASP.NET\\SmallEcommerceApi\\Services\\Interfaces\\IUserService.cs",
+              "RelativeDocumentMoniker": "SmallEcommerceApi\\Services\\Interfaces\\IUserService.cs",
+              "ToolTip": "C:\\Users\\pong7\\OneDrive\\Documents\\Assignment ASP.NET\\SmallEcommerceApi\\Services\\Interfaces\\IUserService.cs",
+              "RelativeToolTip": "SmallEcommerceApi\\Services\\Interfaces\\IUserService.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvw4AAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-20T04:09:30.262Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "UserService.cs",
+              "DocumentMoniker": "C:\\Users\\pong7\\OneDrive\\Documents\\Assignment ASP.NET\\SmallEcommerceApi\\Services\\UserService.cs",
+              "RelativeDocumentMoniker": "SmallEcommerceApi\\Services\\UserService.cs",
+              "ToolTip": "C:\\Users\\pong7\\OneDrive\\Documents\\Assignment ASP.NET\\SmallEcommerceApi\\Services\\UserService.cs",
+              "RelativeToolTip": "SmallEcommerceApi\\Services\\UserService.cs",
+              "ViewState": "AgIAAI8AAAAAAAAAAAAuwA8AAAAeAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-20T04:09:28.28Z",
+              "EditorCaption": ""
+            }
+          ]
+        },
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "AuthDto.cs",
+              "DocumentMoniker": "C:\\Users\\pong7\\OneDrive\\Documents\\Assignment ASP.NET\\SmallEcommerceApi\\DTOs\\Auth\\AuthDto.cs",
+              "RelativeDocumentMoniker": "SmallEcommerceApi\\DTOs\\Auth\\AuthDto.cs",
+              "ToolTip": "C:\\Users\\pong7\\OneDrive\\Documents\\Assignment ASP.NET\\SmallEcommerceApi\\DTOs\\Auth\\AuthDto.cs",
+              "RelativeToolTip": "SmallEcommerceApi\\DTOs\\Auth\\AuthDto.cs",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAqwDkAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-01-20T04:53:34.938Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "ProductVariantOption.cs",
-              "DocumentMoniker": "C:\\Users\\pong7\\OneDrive\\Documents\\Assignment ASP.NET\\SmallEcommerceApi\\Models\\Products\\ProductVariantOption.cs",
-              "RelativeDocumentMoniker": "SmallEcommerceApi\\Models\\Products\\ProductVariantOption.cs",
-              "ToolTip": "C:\\Users\\pong7\\OneDrive\\Documents\\Assignment ASP.NET\\SmallEcommerceApi\\Models\\Products\\ProductVariantOption.cs",
-              "RelativeToolTip": "SmallEcommerceApi\\Models\\Products\\ProductVariantOption.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAADwvwUAAAAFAAAAAAAAAA==",
+              "Title": "JwtSettings.cs",
+              "DocumentMoniker": "C:\\Users\\pong7\\OneDrive\\Documents\\Assignment ASP.NET\\SmallEcommerceApi\\Settings\\JwtSettings.cs",
+              "RelativeDocumentMoniker": "SmallEcommerceApi\\Settings\\JwtSettings.cs",
+              "ToolTip": "C:\\Users\\pong7\\OneDrive\\Documents\\Assignment ASP.NET\\SmallEcommerceApi\\Settings\\JwtSettings.cs",
+              "RelativeToolTip": "SmallEcommerceApi\\Settings\\JwtSettings.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-02T14:44:10.062Z",
+              "WhenOpened": "2026-01-20T04:18:31.189Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "ProductVariantDto.cs",
-              "DocumentMoniker": "C:\\Users\\pong7\\OneDrive\\Documents\\Assignment ASP.NET\\SmallEcommerceApi\\DTOs\\Products\\ProductVariantDto.cs",
-              "RelativeDocumentMoniker": "SmallEcommerceApi\\DTOs\\Products\\ProductVariantDto.cs",
-              "ToolTip": "C:\\Users\\pong7\\OneDrive\\Documents\\Assignment ASP.NET\\SmallEcommerceApi\\DTOs\\Products\\ProductVariantDto.cs",
-              "RelativeToolTip": "SmallEcommerceApi\\DTOs\\Products\\ProductVariantDto.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAADwvwwAAAAAAAAAAAAAAA==",
+              "Title": "AuthService.cs",
+              "DocumentMoniker": "C:\\Users\\pong7\\OneDrive\\Documents\\Assignment ASP.NET\\SmallEcommerceApi\\Services\\AuthService.cs",
+              "RelativeDocumentMoniker": "SmallEcommerceApi\\Services\\AuthService.cs",
+              "ToolTip": "C:\\Users\\pong7\\OneDrive\\Documents\\Assignment ASP.NET\\SmallEcommerceApi\\Services\\AuthService.cs",
+              "RelativeToolTip": "SmallEcommerceApi\\Services\\AuthService.cs",
+              "ViewState": "AgIAAB8AAAAAAAAAAAAkwD0AAAAMAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-01-02T14:21:39.463Z",
+              "WhenOpened": "2026-01-20T04:19:27.751Z",
               "EditorCaption": ""
             }
           ]

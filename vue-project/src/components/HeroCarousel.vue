@@ -133,7 +133,7 @@ onUnmounted(() => {
         </div>
         
         <!-- Navigation Arrows -->
-        <button @click="prevSlide"
+        <!-- <button @click="prevSlide"
             class="absolute left-8 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/5 backdrop-blur-md hover:bg-white text-white hover:text-gray-900 border border-white/20 rounded-full flex items-center justify-center transition-all duration-500 z-20 group"
             aria-label="Previous slide">
             <ChevronLeft class="w-6 h-6 group-hover:-translate-x-1 transition-transform" />
@@ -142,7 +142,7 @@ onUnmounted(() => {
             class="absolute right-8 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/5 backdrop-blur-md hover:bg-white text-white hover:text-gray-900 border border-white/20 rounded-full flex items-center justify-center transition-all duration-500 z-20 group"
             aria-label="Next slide">
             <ChevronRight class="w-6 h-6 group-hover:translate-x-1 transition-transform" />
-        </button>
+        </button> -->
         
         <!-- Dots Indicator -->
         <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-3 z-20">

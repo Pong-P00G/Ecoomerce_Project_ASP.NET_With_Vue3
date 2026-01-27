@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿#nullable enable
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using SmallEcommerceApi.Db;
@@ -26,6 +28,7 @@ namespace SmallEcommerceApi.Controllers.Products
 
         // CREATE PRODUCT
         [HttpPost]
+        [Authorize(Roles = "ADMIN,Admin,admin")]
         public async Task<IActionResult> CreateProductWithVariants(
             [FromBody] CreateProductWithVariantDto dto)
         {
@@ -250,24 +253,23 @@ namespace SmallEcommerceApi.Controllers.Products
                 .OrderByDescending(p => p.CreatedAt)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
-                .Select(p => new
+                .Select(p => new ProductResponseDto
                 {
-                    p.ProductId,
-                    p.ProductName,
-                    p.Description,
-                    p.BasePrice,
-                    p.SKU,
-                    p.Stock,
-                    p.MinStock,
-                    p.Supplier,
-                    // Calculate stock status in SQL
+                    ProductId = p.ProductId,
+                    ProductName = p.ProductName,
+                    Description = p.Description,
+                    BasePrice = p.BasePrice,
+                    SKU = p.SKU,
+                    Stock = p.Stock,
+                    MinStock = p.MinStock,
+                    Supplier = p.Supplier,
                     StockStatus = p.Stock == 0 ? "out-of-stock" :
                                   p.Stock <= p.MinStock ? "low-stock" :
                                   "in-stock",
-                    p.IsActive,
-                    p.Featured,
-                    p.CreatedAt,
-                    p.UpdatedAt,
+                    IsActive = p.IsActive,
+                    Featured = p.Featured,
+                    CreatedAt = p.CreatedAt,
+                    UpdatedAt = p.UpdatedAt,
                     Categories = p.ProductCategories.Select(pc => new CategoryDto
                     {
                         CategoryId = pc.CategoryId,
@@ -283,33 +285,13 @@ namespace SmallEcommerceApi.Controllers.Products
                 })
                 .ToListAsync();
 
-            // Map to ProductResponseDto
-            var productDtos = products.Select(p => new ProductResponseDto
-            {
-                ProductId = p.ProductId,
-                ProductName = p.ProductName,
-                Description = p.Description,
-                BasePrice = p.BasePrice,
-                SKU = p.SKU,
-                Stock = p.Stock,
-                MinStock = p.MinStock,
-                Supplier = p.Supplier,
-                StockStatus = p.StockStatus,
-                IsActive = p.IsActive,
-                Featured = p.Featured,
-                CreatedAt = p.CreatedAt,
-                UpdatedAt = p.UpdatedAt,
-                Categories = p.Categories,
-                Images = p.Images
-            }).ToList();
-
             return Ok(new
             {
                 page,
                 pageSize,
                 totalItems,
                 totalPages = (int)Math.Ceiling(totalItems / (double)pageSize),
-                items = productDtos
+                items = products
             });
         }
 
@@ -325,6 +307,7 @@ namespace SmallEcommerceApi.Controllers.Products
 
         // UPDATE
         [HttpPut("{id:int}")]
+        [Authorize(Roles = "ADMIN,Admin,admin")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateProductDto dto)
         {
             var product = await _db.Products.FindAsync(id);
@@ -366,6 +349,25 @@ namespace SmallEcommerceApi.Controllers.Products
             if (dto.Featured.HasValue)
                 product.Featured = dto.Featured.Value;
 
+            if (dto.ImageUrls != null)
+            {
+                var existingImages = _db.ProductImages.Where(i => i.ProductId == id);
+                _db.ProductImages.RemoveRange(existingImages);
+
+                int order = 0;
+                foreach (var imgUrl in dto.ImageUrls.Where(url => !string.IsNullOrWhiteSpace(url)))
+                {
+                    _db.ProductImages.Add(new ProductImage
+                    {
+                        ProductId = id,
+                        ImageUrl = imgUrl,
+                        IsPrimary = order == 0,
+                        DisplayOrder = order++,
+                        CreatedAt = DateTime.UtcNow
+                    });
+                }
+            }
+
             product.UpdatedAt = DateTime.UtcNow;
 
             await _db.SaveChangesAsync();
@@ -376,6 +378,7 @@ namespace SmallEcommerceApi.Controllers.Products
 
         // SOFT DELETE
         [HttpDelete("{id:int}/Soft")] //Soft it does not remove the row from the database
+        [Authorize(Roles = "ADMIN,Admin,admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var product = await _db.Products.FindAsync(id);
@@ -391,6 +394,7 @@ namespace SmallEcommerceApi.Controllers.Products
         }
 
         [HttpDelete("{id:int}/hard")]
+        [Authorize(Roles = "ADMIN,Admin,admin")]
         public async Task<IActionResult> HardDelete(int id)
         {
             var product = await _db.Products
@@ -418,6 +422,7 @@ namespace SmallEcommerceApi.Controllers.Products
 
         // INVENTORY MANAGEMENT - Update single product stock
         [HttpPatch("{id:int}/stock")]
+        [Authorize(Roles = "ADMIN,Admin,admin")]
         public async Task<IActionResult> UpdateStock(int id, [FromBody] UpdateStockDto dto)
         {
             var product = await _db.Products.FindAsync(id);
@@ -443,6 +448,7 @@ namespace SmallEcommerceApi.Controllers.Products
 
         // BULK STOCK UPDATE
         [HttpPatch("bulk-stock")]
+        [Authorize(Roles = "ADMIN,Admin,admin")]
         public async Task<IActionResult> BulkUpdateStock([FromBody] List<BulkStockUpdateDto> updates)
         {
             if (updates == null || !updates.Any())
@@ -472,23 +478,23 @@ namespace SmallEcommerceApi.Controllers.Products
             // ⭐ FIX: Calculate stock status in SQL
             var product = await _db.Products
                 .Where(p => p.ProductId == id)
-                .Select(p => new
+                .Select(p => new ProductResponseDto
                 {
-                    p.ProductId,
-                    p.ProductName,
-                    p.Description,
-                    p.BasePrice,
-                    p.SKU,
-                    p.Stock,
-                    p.MinStock,
-                    p.Supplier,
+                    ProductId = p.ProductId,
+                    ProductName = p.ProductName,
+                    Description = p.Description,
+                    BasePrice = p.BasePrice,
+                    SKU = p.SKU,
+                    Stock = p.Stock,
+                    MinStock = p.MinStock,
+                    Supplier = p.Supplier,
                     StockStatus = p.Stock == 0 ? "out-of-stock" :
                                   p.Stock <= p.MinStock ? "low-stock" :
                                   "in-stock",
-                    p.IsActive,
-                    p.Featured,
-                    p.CreatedAt,
-                    p.UpdatedAt,
+                    IsActive = p.IsActive,
+                    Featured = p.Featured,
+                    CreatedAt = p.CreatedAt,
+                    UpdatedAt = p.UpdatedAt,
                     Categories = p.ProductCategories.Select(pc => new CategoryDto
                     {
                         CategoryId = pc.CategoryId,
@@ -500,32 +506,23 @@ namespace SmallEcommerceApi.Controllers.Products
                         ImageUrl = img.ImageUrl,
                         IsPrimary = img.IsPrimary,
                         DisplayOrder = img.DisplayOrder
+                    }).OrderBy(i => i.DisplayOrder).ToList(),
+                    Variants = p.ProductVariants.Select(pv => new VariantResponseDto
+                    {
+                        ProductVariantId = pv.ProductVariantId,
+                        SKU = pv.SKU,
+                        Price = pv.Price,
+                        StockQuantity = pv.StockQuantity,
+                        Options = pv.ProductVariantOptions.Select(pvo => new VariantOptionDto
+                        {
+                            Variant = pvo.VariantOption.Variant.Name,
+                            Value = pvo.VariantOption.OptionValue
+                        }).ToList()
                     }).ToList()
                 })
                 .FirstOrDefaultAsync();
 
-            if (product == null)
-                return null;
-
-            // ⭐ Map to ProductResponseDto
-            return new ProductResponseDto
-            {
-                ProductId = product.ProductId,
-                ProductName = product.ProductName,
-                Description = product.Description,
-                BasePrice = product.BasePrice,
-                SKU = product.SKU,
-                Stock = product.Stock,
-                MinStock = product.MinStock,
-                Supplier = product.Supplier,
-                StockStatus = product.StockStatus,
-                IsActive = product.IsActive,
-                Featured = product.Featured,
-                CreatedAt = product.CreatedAt,
-                UpdatedAt = product.UpdatedAt,
-                Categories = product.Categories,
-                Images = product.Images
-            };
+            return product;
         }
     }
 

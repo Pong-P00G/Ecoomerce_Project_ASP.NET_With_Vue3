@@ -268,9 +268,13 @@ C:\Users\pong7\OneDrive\Documents\Assignment ASP.NET\SmallEcommerceApi\bin\Debug
 C:\Users\pong7\OneDrive\Documents\Assignment ASP.NET\SmallEcommerceApi\bin\Debug\net10.0\SmallEcommerceApi.runtimeconfig.json
 C:\Users\pong7\OneDrive\Documents\Assignment ASP.NET\SmallEcommerceApi\bin\Debug\net10.0\SmallEcommerceApi.dll
 C:\Users\pong7\OneDrive\Documents\Assignment ASP.NET\SmallEcommerceApi\bin\Debug\net10.0\SmallEcommerceApi.pdb
+C:\Users\pong7\OneDrive\Documents\Assignment ASP.NET\SmallEcommerceApi\bin\Debug\net10.0\AutoMapper.dll
+C:\Users\pong7\OneDrive\Documents\Assignment ASP.NET\SmallEcommerceApi\bin\Debug\net10.0\AutoMapper.Extensions.Microsoft.DependencyInjection.dll
 C:\Users\pong7\OneDrive\Documents\Assignment ASP.NET\SmallEcommerceApi\bin\Debug\net10.0\Azure.Core.dll
 C:\Users\pong7\OneDrive\Documents\Assignment ASP.NET\SmallEcommerceApi\bin\Debug\net10.0\Azure.Identity.dll
+C:\Users\pong7\OneDrive\Documents\Assignment ASP.NET\SmallEcommerceApi\bin\Debug\net10.0\BCrypt.Net-Next.dll
 C:\Users\pong7\OneDrive\Documents\Assignment ASP.NET\SmallEcommerceApi\bin\Debug\net10.0\Humanizer.dll
+C:\Users\pong7\OneDrive\Documents\Assignment ASP.NET\SmallEcommerceApi\bin\Debug\net10.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 C:\Users\pong7\OneDrive\Documents\Assignment ASP.NET\SmallEcommerceApi\bin\Debug\net10.0\Microsoft.AspNetCore.OpenApi.dll
 C:\Users\pong7\OneDrive\Documents\Assignment ASP.NET\SmallEcommerceApi\bin\Debug\net10.0\Microsoft.Bcl.AsyncInterfaces.dll
 C:\Users\pong7\OneDrive\Documents\Assignment ASP.NET\SmallEcommerceApi\bin\Debug\net10.0\Microsoft.Bcl.Cryptography.dll

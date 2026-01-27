@@ -1,100 +1,137 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using SmallEcommerceApi.Db;
 using SmallEcommerceApi.DTOs.Auth;
-using SmallEcommerceApi.Mapping;
+using SmallEcommerceApi.Models.Auth;
 using SmallEcommerceApi.Models.Users;
-using static SmallEcommerceApi.DTOs.Auth.Login;
+using SmallEcommerceApi.Security;
+using SmallEcommerceApi.Security.Api.Security;
+using SmallEcommerceApi.Services;
+using SmallEcommerceApi.Services.Interfaces;
+using static SmallEcommerceApi.DTOs.Auth.AuthDto;
 
 namespace SmallEcommerceApi.Controllers.Auth
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/auth")]
     public class AuthController : ControllerBase
     {
         private readonly AppDbContext _db;
-        private readonly PasswordHasher<User> _passwordHasher = new PasswordHasher<User>();
+        private readonly IPasswordHasher _passwordService;
+        private readonly JwtService _jwtService;
+        private readonly IAuthService _authService;
 
-        public AuthController(AppDbContext db)
+        public AuthController(
+            AppDbContext db,
+            IPasswordHasher passwordService,
+            JwtService jwtService,
+            IAuthService authService)
         {
             _db = db;
+            _passwordService = passwordService;
+            _jwtService = jwtService;
+            _authService = authService;
         }
 
         // REGISTER
         [HttpPost("register")]
-        public async Task<ActionResult<UserDto>> Register(RegisterDto dto)
+        public async Task<ActionResult<AuthResponseDto>> Register([FromBody] RegisterDto registerDto)
         {
-            if (!RoleMap.ContainsKey(dto.Role))
-                return BadRequest("Invalid role.");
+            if (string.IsNullOrWhiteSpace(registerDto.Password))
+                return BadRequest("Password is required.");
 
-            if (dto.Role.Equals("admin", StringComparison.OrdinalIgnoreCase))
-                return Forbid("Admin registration is not allowed.");
+            var result = await _authService.RegisterAsync(registerDto);
 
-            var user = new User
-            {
-                Username = dto.Username,
-                Email = dto.Email,
-                PasswordHash = _passwordHasher.HashPassword(null, dto.Password),
-                FirstName = dto.FirstName,
-                LastName = dto.LastName,
-                RoleId = RoleMap.GetRoleId(dto.Role),
-                IsActive = true,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
+            if (result == null)
+                return BadRequest("Registration failed. Email or username may already exist.");
 
-            _db.Users.Add(user);
-            await _db.SaveChangesAsync();
-
-            return Ok(new UserDto
-            {
-                UserId = user.UserId,
-                Username = user.Username,
-                Email = user.Email,
-                IsActive = user.IsActive
-            });
+            return Ok(result);
         }
 
-        // LOGIN
+        // LOGIN (JWT) - FIXED
         [HttpPost("login")]
-        public async Task<ActionResult<UserDto>> Login([FromBody] LoginDto dto)
+        public async Task<ActionResult<AuthResponseDto>> Login(LoginDto dto)
         {
-            var user = await _db.Users.FirstOrDefaultAsync(u =>
-                u.Email.Equals(dto.Email, StringComparison.OrdinalIgnoreCase));
+            if (string.IsNullOrWhiteSpace(dto.Password))
+                return BadRequest("Password is required.");
 
-            if (user == null)
-                return BadRequest("Invalid email or password.");
+            var result = await _authService.LoginAsync(dto);
 
-            var result = _passwordHasher.VerifyHashedPassword(user, user.PasswordHash, dto.Password);
-            if (result == PasswordVerificationResult.Failed)
-                return BadRequest("Invalid email or password.");
+            if (result == null)
+                return BadRequest("Invalid username/email or password.");
 
-            var userDto = new UserDto
-            {
-                UserId = user.UserId,
-                Username = user.Username,
-                Email = user.Email,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                IsActive = user.IsActive
-            };
-
-            return Ok(userDto);
+            return Ok(result);
         }
 
-        // FORGOT PASSWORD
-        [HttpPost("forgot-password")]
-        public async Task<ActionResult> ForgotPassword([FromBody] ForgotPasswordDto dto)
+        // REFRESH TOKEN - NEW
+        [HttpPost("refresh")]
+        public async Task<ActionResult<AuthResponseDto>> RefreshToken([FromBody] DTOs.Auth.RefreshTokenDto refreshTokenDto)
         {
-            var user = await _db.Users.FirstOrDefaultAsync(u =>
-                u.Email.Equals(dto.Email, StringComparison.OrdinalIgnoreCase));
+            if (string.IsNullOrWhiteSpace(refreshTokenDto.RefreshToken))
+                return BadRequest("Refresh token is required.");
 
-            if (user == null)
-                return NotFound("Email not found.");
+            var result = await _authService.RefreshTokenAsync(refreshTokenDto.RefreshToken);
 
-            // TODO: send reset link via email in production
-            return Ok($"Password reset link sent to {dto.Email} (simulated).");
+            if (result == null)
+                return Unauthorized("Invalid or expired refresh token.");
+
+            return Ok(result);
+        }
+
+        // LOGOUT - NEW
+        [Authorize]
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypesCustom.UserId)?.Value;
+
+            if (userIdClaim == null || !int.TryParse(userIdClaim, out int userId))
+            {
+                return Unauthorized();
+            }
+
+            await _authService.LogoutAsync(userId);
+
+            return Ok(new { message = "Logged out successfully." });
+        }
+
+        [Authorize]
+        [HttpPost("revoke")]
+        public async Task<IActionResult> RevokeToken([FromBody] DTOs.Auth.RefreshTokenDto refreshTokenDto)
+        {
+            if (string.IsNullOrWhiteSpace(refreshTokenDto.RefreshToken))
+                return BadRequest("Refresh token is required.");
+
+            var result = await _authService.RevokeRefreshTokenAsync(refreshTokenDto.RefreshToken);
+
+            if (!result)
+            {
+                return BadRequest(new { message = "Token not found." });
+            }
+
+            return Ok(new { message = "Token revoked successfully." });
+        }
+
+
+        [Authorize]
+        [HttpGet("me")]
+        public IActionResult GetCurrentUser()
+        {
+            var userId = User.FindFirst(ClaimTypesCustom.UserId)?.Value;
+            var username = User.FindFirst(ClaimTypes.Name)?.Value;
+            var email = User.FindFirst(ClaimTypesCustom.Email)?.Value;
+            var role = User.FindFirst(ClaimTypesCustom.Role)?.Value;
+
+            return Ok(new
+            {
+                userId,
+                username,
+                email,
+                role
+            });
         }
     }
 }

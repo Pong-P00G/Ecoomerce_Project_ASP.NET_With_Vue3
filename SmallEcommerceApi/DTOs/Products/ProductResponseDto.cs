@@ -20,5 +20,6 @@
 
         public List<CategoryDto> Categories { get; set; } = new();
         public List<ImageDto> Images { get; set; } = new();
+        public List<VariantResponseDto> Variants { get; set; } = new();
     }
 }

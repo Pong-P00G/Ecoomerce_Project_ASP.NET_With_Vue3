@@ -13,9 +13,11 @@ import {
     Eye,
     AlertCircle,
     CheckCircle,
-    Activity
+    Activity,
+    RefreshCw
 } from 'lucide-vue-next'
 import { authAPI } from '../../api/authApi.js'
+import api from '../../api/api.js'
 
 // State
 const users = ref([])
@@ -107,13 +109,20 @@ const fetchUsers = async () => {
         error.value = null
 
         const response = await api.get('/users')
-        users.value = response.data.users || []
+        users.value = (response.data || []).map(u => ({
+            id: u.userId,
+            name: u.fullName || `${u.firstName} ${u.lastName}`.trim(),
+            email: u.email,
+            role: u.roleName || (u.roleId === 1 ? 'Admin' : 'Customer'),
+            status: u.isActive ? 'active' : 'inactive',
+            phone: 'N/A',
+            department: 'General',
+            createdAt: new Date(u.createdAt).toLocaleDateString()
+        }))
 
     } catch (err) {
         error.value = err.response?.data?.message || 'Failed to load users'
         console.error('Error fetching users:', err)
-
-
     } finally {
         loading.value = false
     }
@@ -133,7 +142,10 @@ const openAddModal = () => {
 
 const openEditModal = (user) => {
     currentUser.value = user
-    formData.value = { ...user }
+    formData.value = { 
+        ...user,
+        role: user.role // Ensure role is mapped correctly
+    }
     showEditModal.value = true
 }
 
@@ -154,18 +166,28 @@ const handleAddUser = async () => {
         loading.value = true
         error.value = null
 
+        const names = formData.value.name.split(' ')
+        const firstName = names[0]
+        const lastName = names.length > 1 ? names.slice(1).join(' ') : 'User'
+
+        const roleMapping = { 'Admin': 1, 'Customer': 2 }
+        
         const userData = {
-            name: formData.value.name,
+            username: formData.value.email.split('@')[0], // Generate username from email
             email: formData.value.email,
-            role: formData.value.role,
-            status: formData.value.status,
-            phone: formData.value.phone,
-            department: formData.value.department
+            password: 'Password123!', // Default temporary password
+            firstName: firstName,
+            lastName: lastName,
+            roleId: roleMapping[formData.value.role] || 2,
+            isActive: formData.value.status === 'active'
         }
 
         // API call
         const response = await api.post('/users', userData)
-        users.value.push(response.data.user)
+        
+        // Refetch to get clean state
+        await fetchUsers()
+        
         success.value = 'User added successfully!'
         closeModals()
         setTimeout(() => success.value = null, 3000)
@@ -181,21 +203,27 @@ const handleUpdateUser = async () => {
         loading.value = true
         error.value = null
 
+        const names = formData.value.name.split(' ')
+        const firstName = names[0]
+        const lastName = names.length > 1 ? names.slice(1).join(' ') : ''
+
+        const roleMapping = { 'Admin': 1, 'Customer': 2 }
+
         const userData = {
-            name: formData.value.name,
+            firstName: firstName,
+            lastName: lastName,
             email: formData.value.email,
-            role: formData.value.role,
-            status: formData.value.status,
+            // Only send role if we are admin (implied by this page access)
+            roleId: roleMapping[formData.value.role], 
+            isActive: formData.value.status === 'active'
         }
 
         // API call
-        await authAPI.put(`/users/${currentUser.value.id}`, userData)
+        await api.put(`/users/${currentUser.value.id}`, userData)
 
-        // Update locally
-        const index = users.value.findIndex(u => u.id === currentUser.value.id)
-        if (index !== -1) {
-            users.value[index] = { ...users.value[index], ...userData }
-        }
+        // Refetch
+        await fetchUsers()
+
         success.value = 'User updated successfully!'
         closeModals()
         setTimeout(() => success.value = null, 3000)
@@ -215,7 +243,7 @@ const handleDeleteUser = async (id) => {
         error.value = null
 
         // API call
-        const response = await authAPI.delete(`/users/${id}`)
+        const response = await api.delete(`/users/${id}`)
 
         users.value = users.value.filter(u => u.id !== id)
 
@@ -408,63 +436,105 @@ onMounted(() => {
           <p class="text-slate-400 mt-2 text-sm font-medium max-w-xs mx-auto">We couldn't find any users matching your current filters.</p>
         </div>
 
-        <div v-else class="overflow-x-auto">
-          <table class="w-full">
-            <thead>
-              <tr class="bg-slate-50/50 border-b border-slate-100">
-                <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Member</th>
-                <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Department</th>
-                <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Role</th>
-                <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Status</th>
-                <th class="px-8 py-5 text-right text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Actions</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-50">
-              <tr v-for="user in filteredUsers" :key="user.id"
-                class="group hover:bg-slate-50/80 transition-all duration-200">
-                <td class="px-8 py-5">
-                  <div class="flex items-center gap-4">
-                    <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center shrink-0 border border-slate-200/50 group-hover:scale-110 transition-transform duration-300">
-                      <span class="text-sm font-black text-slate-500">{{ user.name.charAt(0) }}</span>
-                    </div>
-                    <div class="min-w-0">
-                      <p class="text-sm font-bold text-slate-900 truncate tracking-tight">{{ user.name }}</p>
-                      <p class="text-[11px] font-medium text-slate-400 truncate">{{ user.email }}</p>
-                    </div>
+        <div v-else>
+          <!-- Mobile View (Cards) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 lg:hidden">
+            <div v-for="user in filteredUsers" :key="user.id" 
+              class="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm flex flex-col gap-4">
+              <div class="flex items-start justify-between">
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center shrink-0 border border-slate-200/50">
+                    <span class="text-lg font-black text-slate-500">{{ user.name.charAt(0) }}</span>
                   </div>
-                </td>
-                <td class="px-8 py-5">
-                  <p class="text-xs font-bold text-slate-600 uppercase tracking-wider">{{ user.department || 'General' }}</p>
-                </td>
-                <td class="px-8 py-5">
-                  <span class="inline-flex items-center px-2.5 py-1 bg-blue-50 text-blue-700 rounded-lg text-[10px] font-black uppercase tracking-widest border border-blue-100">
-                    {{ user.role }}
-                  </span>
-                </td>
-                <td class="px-8 py-5">
-                  <span :class="`inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${user.status === 'active' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-rose-50 text-rose-700 border-rose-100'}`">
+                  <div>
+                    <p class="text-sm font-bold text-slate-900 line-clamp-1">{{ user.name }}</p>
+                    <p class="text-[11px] font-medium text-slate-400 line-clamp-1">{{ user.email }}</p>
+                  </div>
+                </div>
+                <div class="flex flex-col items-end gap-1">
+                   <span :class="`px-2 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${user.status === 'active' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-rose-50 text-rose-700 border-rose-100'}`">
                     {{ user.status }}
                   </span>
-                </td>
-                <td class="px-8 py-5">
-                  <div class="flex justify-end gap-2">
-                    <button @click="openViewModal(user)"
-                      class="p-2 text-slate-400 hover:text-slate-900 hover:bg-white hover:shadow-sm rounded-lg transition-all border border-transparent hover:border-slate-100">
+                  <p class="text-[10px] font-bold text-slate-400">{{ user.role }}</p>
+                </div>
+              </div>
+              
+              <div class="flex items-center justify-between pt-4 border-t border-slate-50 mt-auto">
+                 <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">{{ user.department || 'General' }}</p>
+                 <div class="flex gap-1">
+                    <button @click="openViewModal(user)" class="p-2 text-slate-400 hover:text-slate-900 bg-slate-50 rounded-lg">
                       <Eye class="w-4 h-4" />
                     </button>
-                    <button @click="openEditModal(user)"
-                      class="p-2 text-slate-400 hover:text-blue-600 hover:bg-white hover:shadow-sm rounded-lg transition-all border border-transparent hover:border-slate-100">
+                    <button @click="openEditModal(user)" class="p-2 text-slate-400 hover:text-blue-600 bg-slate-50 rounded-lg">
                       <Edit2 class="w-4 h-4" />
                     </button>
-                    <button @click="handleDeleteUser(user.id)"
-                      class="p-2 text-slate-400 hover:text-rose-600 hover:bg-white hover:shadow-sm rounded-lg transition-all border border-transparent hover:border-slate-100">
+                    <button @click="handleDeleteUser(user.id)" class="p-2 text-slate-400 hover:text-rose-600 bg-slate-50 rounded-lg">
                       <Trash2 class="w-4 h-4" />
                     </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                 </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Desktop View (Table) -->
+          <div class="hidden lg:block overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="bg-slate-50/50 border-b border-slate-100">
+                  <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Member</th>
+                  <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Department</th>
+                  <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Role</th>
+                  <th class="px-8 py-5 text-left text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Status</th>
+                  <th class="px-8 py-5 text-right text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-50">
+                <tr v-for="user in filteredUsers" :key="user.id"
+                  class="group hover:bg-slate-50/80 transition-all duration-200">
+                  <td class="px-8 py-5">
+                    <div class="flex items-center gap-4">
+                      <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center shrink-0 border border-slate-200/50 group-hover:scale-110 transition-transform duration-300">
+                        <span class="text-sm font-black text-slate-500">{{ user.name.charAt(0) }}</span>
+                      </div>
+                      <div class="min-w-0">
+                        <p class="text-sm font-bold text-slate-900 truncate tracking-tight">{{ user.name }}</p>
+                        <p class="text-[11px] font-medium text-slate-400 truncate">{{ user.email }}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-8 py-5">
+                    <p class="text-xs font-bold text-slate-600 uppercase tracking-wider">{{ user.department || 'General' }}</p>
+                  </td>
+                  <td class="px-8 py-5">
+                    <span class="inline-flex items-center px-2.5 py-1 bg-blue-50 text-blue-700 rounded-lg text-[10px] font-black uppercase tracking-widest border border-blue-100">
+                      {{ user.role }}
+                    </span>
+                  </td>
+                  <td class="px-8 py-5">
+                    <span :class="`inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest border ${user.status === 'active' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-rose-50 text-rose-700 border-rose-100'}`">
+                      {{ user.status }}
+                    </span>
+                  </td>
+                  <td class="px-8 py-5">
+                    <div class="flex justify-end gap-2">
+                      <button @click="openViewModal(user)"
+                        class="p-2 text-slate-400 hover:text-slate-900 hover:bg-white hover:shadow-sm rounded-lg transition-all border border-transparent hover:border-slate-100">
+                        <Eye class="w-4 h-4" />
+                      </button>
+                      <button @click="openEditModal(user)"
+                        class="p-2 text-slate-400 hover:text-blue-600 hover:bg-white hover:shadow-sm rounded-lg transition-all border border-transparent hover:border-slate-100">
+                        <Edit2 class="w-4 h-4" />
+                      </button>
+                      <button @click="handleDeleteUser(user.id)"
+                        class="p-2 text-slate-400 hover:text-rose-600 hover:bg-white hover:shadow-sm rounded-lg transition-all border border-transparent hover:border-slate-100">
+                        <Trash2 class="w-4 h-4" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </main>
